@@ -7,8 +7,8 @@
   color: #000;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  font-family: "Helvetica Neue", sans-serif;
+  gap: 1.5rem;
+  font-family: 'Helvetica Neue', sans-serif;
 }
 
 .register-form h2 {
@@ -24,6 +24,8 @@
   font-size: 1rem;
   color: #000;
   outline: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .register-form input:focus {
@@ -38,10 +40,36 @@
   cursor: pointer;
   font-weight: bold;
   transition: background 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .register-form button:hover {
   background: #444;
+}
+
+.social-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.social-buttons button {
+  padding: 0.75rem;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  font-weight: bold;
+  cursor: pointer;
+  width: 48%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.social-buttons button:hover {
+  background: #e0e0e0;
 }
 
 .error {
@@ -49,3 +77,24 @@
   font-size: 0.9rem;
   text-align: center;
 }
+
+.google-btn {
+  background-color: #db4437;
+  color: white;
+  border: none;
+}
+
+.google-btn:hover {
+  background-color: #c33d2f;
+}
+
+.facebook-btn {
+  background-color: #4267B2;
+  color: white;
+  border: none;
+}
+
+.facebook-btn:hover {
+  background-color: #375899;
+}
+
