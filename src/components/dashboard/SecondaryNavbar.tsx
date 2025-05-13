@@ -1,84 +1,59 @@
 import React, { useState } from "react";
 import TableGrid from "./TableGrid";
 
-// PREDEFINED PLANTS (would eventually come from a DB or user input)
 const plantOptions = ["Rosemary", "Thyme", "Basil"];
 
-/**
- * SecondaryNavbar Component
- *
- * This component manages the interactive UI for creating and editing a table-based layout
- * where users can define “growth areas” (selected cells) and assign plants to each one.
- */
 const SecondaryNavbar: React.FC = () => {
-    // Initial number of rows and columns in the table
     const [rows, setRows] = useState(3);
     const [cols, setCols] = useState(4);
-
-    // UI state toggles
-    const [showPopup, setShowPopup] = useState(false);   // Show 'Set Table Size' modal
-    const [editMode, setEditMode] = useState(false);     // Toggle cell selection mode
-
-    // Inputs for modifying table size
+    const [showPopup, setShowPopup] = useState(false);
+    const [editMode, setEditMode] = useState(false);
     const [inputRows, setInputRows] = useState(rows);
     const [inputCols, setInputCols] = useState(cols);
-
-    // Stores selected cell keys like '2-3' (row-col)
     const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
-
-    // Map of cell key -> plant name
     const [plantAssignments, setPlantAssignments] = useState<{ [key: string]: string }>({});
-
-    // Which cell is currently being edited with a plant
     const [plantSelectionKey, setPlantSelectionKey] = useState<string | null>(null);
-
-    // Search field for filtering plant names
     const [searchTerm, setSearchTerm] = useState("");
+    const [cellLocations, setCellLocations] = useState<{ [key: string]: "inside" | "outside" }>({});
+    const [locationMode, setLocationMode] = useState<"inside" | "outside" | null>(null);
 
-    /**
-     * Apply button from popup.
-     * Updates the table with new row/col values and resets selections.
-     */
     const handleApply = () => {
         setRows(inputRows);
         setCols(inputCols);
         setShowPopup(false);
         setSelectedCells(new Set());
         setPlantAssignments({});
+        setCellLocations({});
+        setLocationMode(null);
     };
 
-    /**
-     * Handles clicking a cell in the table:
-     * - In edit mode: toggles selection and removes plant if unselected
-     * - In view mode: if selected, opens plant selection popup
-     */
     const toggleCell = (row: number, col: number) => {
         const key = `${row}-${col}`;
         if (editMode) {
             setSelectedCells(prev => {
                 const newSet = new Set(prev);
                 const wasSelected = newSet.has(key);
-                wasSelected ? newSet.delete(key) : newSet.add(key);
-
-                // If unselected, remove the assigned plant
                 if (wasSelected) {
+                    newSet.delete(key);
                     setPlantAssignments(prev => {
                         const updated = { ...prev };
                         delete updated[key];
                         return updated;
                     });
+                } else {
+                    newSet.add(key);
                 }
-
                 return newSet;
             });
         } else if (selectedCells.has(key)) {
-            setPlantSelectionKey(key); // open assign popup
+            if (locationMode) {
+                setCellLocations(prev => ({ ...prev, [key]: locationMode }));
+            } else {
+                setPlantSelectionKey(key);
+            }
         }
     };
 
-    /**
-     * Assign a plant to a selected cell.
-     */
     const assignPlant = (plant: string) => {
         if (!plantSelectionKey) return;
         setPlantAssignments(prev => ({ ...prev, [plantSelectionKey]: plant }));
@@ -86,9 +61,6 @@ const SecondaryNavbar: React.FC = () => {
         setSearchTerm("");
     };
 
-    /**
-     * Removes any assigned plant from the selected cell.
-     */
     const clearPlant = () => {
         if (!plantSelectionKey) return;
         setPlantAssignments(prev => {
@@ -100,17 +72,13 @@ const SecondaryNavbar: React.FC = () => {
         setSearchTerm("");
     };
 
-    /**
-     * Filters the plant list for the assign-plant popup.
-     */
     const filteredPlants = plantOptions.filter(plant =>
         plant.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <>
-            {/* Top navbar for toggles and popups */}
-            <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
+            <nav className="bg-gray-800 text-white px-6 py-4 flex flex-col gap-2 md:flex-row md:justify-between md:items-center">
                 <div className="text-lg font-bold">PetalBot</div>
                 <div className="space-x-2">
                     <button
@@ -125,10 +93,25 @@ const SecondaryNavbar: React.FC = () => {
                     >
                         Set Table Size
                     </button>
+                    <label className="ml-4 inline-flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            checked={locationMode === "inside"}
+                            onChange={() => setLocationMode(prev => prev === "inside" ? null : "inside")}
+                        />
+                        <span>Mark as Inside</span>
+                    </label>
+                    <label className="inline-flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            checked={locationMode === "outside"}
+                            onChange={() => setLocationMode(prev => prev === "outside" ? null : "outside")}
+                        />
+                        <span>Mark as Outside</span>
+                    </label>
                 </div>
             </nav>
 
-            {/* Table size configuration modal */}
             {showPopup && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded shadow-lg space-y-4 text-black">
@@ -173,7 +156,6 @@ const SecondaryNavbar: React.FC = () => {
                 </div>
             )}
 
-            {/* Plant assignment popup */}
             {plantSelectionKey && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded shadow-lg space-y-4 text-black w-96">
@@ -218,7 +200,6 @@ const SecondaryNavbar: React.FC = () => {
                 </div>
             )}
 
-            {/* Table display with interaction logic */}
             <div className="p-6 flex justify-center">
                 <TableGrid
                     rows={rows}
@@ -226,6 +207,7 @@ const SecondaryNavbar: React.FC = () => {
                     selectedCells={selectedCells}
                     editMode={editMode}
                     plantAssignments={plantAssignments}
+                    cellLocations={cellLocations}
                     onCellClick={toggleCell}
                 />
             </div>
