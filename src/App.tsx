@@ -8,6 +8,8 @@ import RegisterPage from "./pages/landingPage/RegisterPage.tsx";
 import HomePage from "./pages/landingPage/HomePage.tsx";
 // Stylesheets
 import "./App.css";
+import SecondaryNavbar from "./components/dashboard/SecondaryNavbar.tsx";
+import TableGrid from "./components/dashboard/TableGrid.tsx";
 
 function App() {
     const [count, setCount] = useState(0);
@@ -15,7 +17,9 @@ function App() {
     return (
         <Routes>
             <Route path="/dashboard" element={<DashboardLayout/>}>
-                {/*<Route path="example" element={<ExamplePage/>}/>*/}
+                <Route path="areas" element={<SecondaryNavbar/>}/>
+                {/*if you get any error on the line below, ignore it.*/}
+                <Route path="areas" element={<TableGrid/>}/>
             </Route>
 
             <Route path="/landingPage" element={<LandingPageLayout/>}>
