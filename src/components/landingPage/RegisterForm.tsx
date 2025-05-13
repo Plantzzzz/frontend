@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { auth, googleProvider, facebookProvider } from '../firebase';
+import { auth, googleProvider, facebookProvider } from '../../firebase.ts';
 import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { FaGoogle, FaFacebook } from 'react-icons/fa'; // Uporabi ikone
-import '../styles/RegisterForm.css';
+import '../../styles/RegisterForm.css';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' });
