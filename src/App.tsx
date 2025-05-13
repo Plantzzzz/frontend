@@ -5,7 +5,7 @@ import DashboardLayout from "./layouts/DashboardLayout.tsx";
 import LandingPageLayout from "./layouts/LandingPageLayout.tsx";
 // Pages
 import RegisterPage from "./pages/landingPage/RegisterPage.tsx";
-import LandingPage from "./pages/landingPage/LandingPage.tsx";
+import HomePage from "./pages/landingPage/HomePage.tsx";
 // Stylesheets
 import "./App.css";
 
@@ -19,7 +19,7 @@ function App() {
             </Route>
 
             <Route path="/landingPage" element={<LandingPageLayout/>}>
-                <Route path="" element={<LandingPage/>}/>
+                <Route path="" element={<HomePage/>}/>
                 <Route path="register" element={<RegisterPage/>}/>
             </Route>
         </Routes>

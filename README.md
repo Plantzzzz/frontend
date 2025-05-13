@@ -1,54 +1,33 @@
-# React + TypeScript + Vite
+# PetalBot Frontend (Vite + React + TailwindCSS)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a modern landing page built using **Vite**, **React**, and **Tailwind CSS**. It features a clean, component-driven layout and is styled using Tailwind utility classes. The landing page includes a navbar, hero section, features, assistant preview, call-to-action section, and footer.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Tech Stack
 
-## Expanding the ESLint configuration
+- **Vite** — for fast dev and build
+- **React** — component-based UI
+- **Tailwind CSS** — utility-first styling
+- **Flowbite markup** — used for some component layout references
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 📁 Project Structure
+
+```bash
+src/
+├── components/ # All of the components per page
+│   └── dashboard   
+│   └── landingPage
+├── layouts/ # Universal layouts, one for the dashboard, the other for the landing page
+│   └── DashboardLayout.tsx
+│   └── LandingPage.tsx
+├── pages/ # These pages get loaded into the layouts, and they use components.
+│   └── landingPage
+│       └── HomePage.tsx
+│       └── RegisterPage.tsx
+│       └── ...
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+So, the entire structure is like this... `components > pages > layouts`. And App.tsx routes everything.

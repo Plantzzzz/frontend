@@ -2,7 +2,7 @@ import React from "react";
 import Navbar from "../../components/landingPage/Navbar.tsx";
 import HeroSection from "../../components/landingPage/HeroSection.tsx";
 
-const LandingPage: React.FC = () => {
+const HomePage: React.FC = () => {
     return (
         <>
             {/*gotta override root styling here*/}
@@ -14,4 +14,4 @@ const LandingPage: React.FC = () => {
     );
 };
 
-export default LandingPage;
+export default HomePage;
