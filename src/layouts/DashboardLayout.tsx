@@ -4,8 +4,11 @@ import Navbar from "../components/landingPage/Navbar.tsx";
 function DashboardLayout() {
     return (
         <div className="dashboard-layout">
-            <Navbar />
-            <Outlet/> {/* This is where child pages get rendered */}
+            <div className="w-full fixed top-0 left-0 z-50">
+                <Navbar/>
+                {/*this is where the child page gets rendered*/}
+                <Outlet/>
+            </div>
         </div>
     )
 }
