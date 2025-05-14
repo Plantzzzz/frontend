@@ -1,5 +1,7 @@
 import React from "react";
 
+// Notes: add plants by clicking and dragging, make it a separate button (for example) and make maarking easy
+
 interface TableGridProps {
     rows: number;
     cols: number;
