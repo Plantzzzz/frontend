@@ -10,6 +10,7 @@ import HomePage from "./pages/landingPage/HomePage.tsx";
 import "./App.css";
 import SecondaryNavbar from "./components/dashboard/SecondaryNavbar.tsx";
 import TableGrid from "./components/dashboard/TableGrid.tsx";
+import PlantRecognizer from "./components/dashboard/PlantRecognizer.tsx";
 
 function App() {
     const [count, setCount] = useState(0);
@@ -20,9 +21,10 @@ function App() {
                 <Route path="areas" element={<SecondaryNavbar/>}/>
                 {/*if you get any error on the line below, ignore it.*/}
                 <Route path="areas" element={<TableGrid/>}/>
+                <Route path="plantrecognition" element={<PlantRecognizer />} />
             </Route>
 
-            <Route path="/landingPage" element={<LandingPageLayout/>}>
+            <Route path="/" element={<LandingPageLayout/>}>
                 <Route path="" element={<HomePage/>}/>
                 <Route path="register" element={<RegisterPage/>}/>
             </Route>
