@@ -1,10 +1,20 @@
 import React from "react";
-import HeroSection from "../../components/landingPage/HeroSection.tsx";
+import {ToolsSection} from "../../components/landingPage/ToolsSection.tsx";
+import {AssistantSection} from "../../components/landingPage/AssistantSection.tsx";
+import {CTASection} from "../../components/landingPage/CTASection.tsx";
+import {TestimonialsSection} from "../../components/landingPage/TestimonialsSection.tsx";
+import {FAQSection} from "../../components/landingPage/FAQSection.tsx";
+import { HeroSection } from "../../components/landingPage/HeroSection.tsx";
 
 const HomePage: React.FC = () => {
     return (
         <>
-            <HeroSection/>
+            <HeroSection />
+            <ToolsSection />
+            <AssistantSection />
+            <CTASection />
+            <TestimonialsSection />
+            <FAQSection />
         </>
     );
 };

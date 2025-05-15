@@ -4,7 +4,7 @@ import Sidebar from "../components/dashboard/Sidebar.tsx";
 
 function DashboardLayout() {
     return (
-        <div className="flex flex-col h-screen bg-gray-900 text-white">
+        <div className="flex flex-col min-h-screen overflow-auto bg-gray-900 text-white">
             {/* Top Navbar */}
             <header className="w-full bg-gray-800 z-50">
                 <Navbar />

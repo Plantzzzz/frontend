@@ -12,11 +12,12 @@ import PlantsPage from "./pages/dashboard/PlantsPage.tsx";
 import FeedingSchedulePage from "./pages/dashboard/FeedingSchedulePage.tsx";
 import ToDoPage from "./pages/dashboard/ToDoPage.tsx";
 import NotesPage from "./pages/dashboard/NotesPage.tsx";
+import AreasPage from "./pages/dashboard/AreasPage.tsx";
+import ImagesPage from "./pages/dashboard/ImagesPage.tsx";
+import AboutPage from "./pages/landingPage/AboutPage.tsx";
+import ContactPage from "./pages/landingPage/ContactPage.tsx";
 // Stylesheets
 import "./App.css";
-import SecondaryNavbar from "./components/dashboard/SecondaryNavbar.tsx";
-import TableGrid from "./components/dashboard/TableGrid.tsx";
-import ImagesPage from "./pages/dashboard/ImagesPage.tsx";
 
 function App() {
     const [count, setCount] = useState(0);
@@ -25,6 +26,7 @@ function App() {
         <Routes>
             <Route path="/dashboard" element={<DashboardLayout/>}>
                 <Route index element={<DashboardPage/>}/>
+
                 <Route path="spaces" element={<SpacesPage/>}/>
                 <Route path="plants" element={<PlantsPage/>}/>
                 <Route path="schedule" element={<FeedingSchedulePage/>}/>
@@ -32,13 +34,15 @@ function App() {
                 <Route path="notes" element={<NotesPage/>}/>
                 <Route path="images" element={<ImagesPage/>}/>
 
-                <Route path="areas" element={<SecondaryNavbar/>}/>
-                <Route path="areas" element={<TableGrid/>}/>
+                <Route path="areas" element={<AreasPage/>}/>
             </Route>
 
             <Route path="/landingPage" element={<LandingPageLayout/>}>
-                <Route path="" element={<HomePage/>}/>
+                <Route index element={<HomePage/>}/>
+
+                <Route path="about" element={<AboutPage/>}/>
                 <Route path="register" element={<RegisterPage/>}/>
+                <Route path="contact" element={<ContactPage/>}/>
             </Route>
         </Routes>
     );
