@@ -13,7 +13,7 @@ const MySidebar = () => {
             <SidebarItems>
                 <SidebarItemGroup>
                     <SidebarItem href="#" icon={HiChartPie}>
-                        Dashboardd
+                        Dashboard
                     </SidebarItem>
                     <SidebarItem href="#" icon={HiInbox}>
                         Inbox
