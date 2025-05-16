@@ -1,27 +1,47 @@
+// src/components/dashboard/SecondaryNavbar.tsx
 import React, { useState } from "react";
-import { Pencil, X, Eraser, Leaf, MapPin } from "lucide-react";
+import { Pencil, X, Eraser, Leaf, MapPin, Save } from "lucide-react";
 import TableGrid from "./TableGrid";
+
+interface SecondaryNavbarProps {
+    initialRows?: number;
+    initialCols?: number;
+    initialAssignments?: { [key: string]: string };
+    initialLocations?: { [key: string]: "inside" | "outside" };
+    onSave?: (data: {
+        rows: number;
+        cols: number;
+        plantAssignments: { [key: string]: string };
+        cellLocations: { [key: string]: "inside" | "outside" };
+    }) => void;
+}
 
 const plantOptions = ["Rosemary", "Thyme", "Basil"];
 
-const SecondaryNavbar: React.FC = () => {
-    const [rows, setRows] = useState(3);
-    const [cols, setCols] = useState(4);
-    const [showPopup, setShowPopup] = useState(false);
+const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
+                                                             initialRows = 3,
+                                                             initialCols = 4,
+                                                             initialAssignments = {},
+                                                             initialLocations = {},
+                                                             onSave
+                                                         }) => {
+    const [rows, setRows] = useState(initialRows);
+    const [cols, setCols] = useState(initialCols);
+    const [plantAssignments, setPlantAssignments] = useState(initialAssignments);
+    const [cellLocations, setCellLocations] = useState(initialLocations);
     const [editMode, setEditMode] = useState(false);
-    const [inputRows, setInputRows] = useState(rows);
-    const [inputCols, setInputCols] = useState(cols);
-    const [resizeDirection, setResizeDirection] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom');
-    const [plantAssignments, setPlantAssignments] = useState<{ [key: string]: string }>({});
-    const [searchTerm, setSearchTerm] = useState("");
-    const [cellLocations, setCellLocations] = useState<{ [key: string]: "inside" | "outside" }>({});
-    const [locationMode, setLocationMode] = useState<"inside" | "outside" | null>(null);
     const [isPlantingMode, setIsPlantingMode] = useState(false);
     const [currentPlant, setCurrentPlant] = useState<string | null>(null);
-    const [plantPickerOpen, setPlantPickerOpen] = useState(false);
+    const [locationMode, setLocationMode] = useState<"inside" | "outside" | null>(null);
     const [isErasing, setIsErasing] = useState(false);
     const [eraseLocation, setEraseLocation] = useState(true);
     const [erasePlant, setErasePlant] = useState(true);
+    const [showPopup, setShowPopup] = useState(false);
+    const [plantPickerOpen, setPlantPickerOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [inputRows, setInputRows] = useState(rows);
+    const [inputCols, setInputCols] = useState(cols);
+    const [resizeDirection, setResizeDirection] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom');
 
     const handleApply = () => {
         let newAssignments: { [key: string]: string } = {};
@@ -120,13 +140,36 @@ const SecondaryNavbar: React.FC = () => {
                         )}
                     </div>
 
-                    <div className="ml-auto">
+                    <div className="ml-auto flex gap-3">
                         <button onClick={() => setShowPopup(true)} className="bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition">
                             <MapPin className="w-4 h-4" /> Set Grid
                         </button>
+                        {onSave && (
+                            <button onClick={() => onSave({ rows, cols, plantAssignments, cellLocations })} className="bg-green-600 hover:bg-green-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition">
+                                <Save className="w-4 h-4" /> Save Table
+                            </button>
+                        )}
                     </div>
                 </div>
             </nav>
+
+            {plantPickerOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded shadow-lg space-y-4 text-black w-96">
+                        <h2 className="text-lg font-bold">Choose a plant to assign</h2>
+                        <input type="text" placeholder="Search plants..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-1" />
+                        <ul className="max-h-48 overflow-y-auto space-y-2">
+                            {plantOptions.filter(p => p.toLowerCase().includes(searchTerm.toLowerCase())).map(plant => (
+                                <li key={plant}><button onClick={() => { setCurrentPlant(plant); setIsPlantingMode(true); setPlantPickerOpen(false); setSearchTerm(""); }} className="w-full text-left bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">{plant}</button></li>
+                            ))}
+                            {plantOptions.filter(p => p.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
+                                <li className="text-gray-500 italic">No plants found.</li>
+                            )}
+                        </ul>
+                        <div className="flex justify-end"><button onClick={() => setPlantPickerOpen(false)} className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-white">Cancel</button></div>
+                    </div>
+                </div>
+            )}
 
             {showPopup && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -173,28 +216,19 @@ const SecondaryNavbar: React.FC = () => {
                 </div>
             )}
 
-
-
-            {plantPickerOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded shadow-lg space-y-4 text-black w-96">
-                        <h2 className="text-lg font-bold">Choose a plant to assign</h2>
-                        <input type="text" placeholder="Search plants..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-1" />
-                        <ul className="max-h-48 overflow-y-auto space-y-2">
-                            {plantOptions.filter(p => p.toLowerCase().includes(searchTerm.toLowerCase())).map(plant => (
-                                <li key={plant}><button onClick={() => { setCurrentPlant(plant); setIsPlantingMode(true); setPlantPickerOpen(false); setSearchTerm(""); }} className="w-full text-left bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">{plant}</button></li>
-                            ))}
-                            {plantOptions.filter(p => p.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
-                                <li className="text-gray-500 italic">No plants found.</li>
-                            )}
-                        </ul>
-                        <div className="flex justify-end"><button onClick={() => setPlantPickerOpen(false)} className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-white">Cancel</button></div>
-                    </div>
-                </div>
-            )}
-
             <div className="p-6 flex justify-center">
-                <TableGrid rows={rows} cols={cols} plantAssignments={plantAssignments} cellLocations={cellLocations} onCellClick={toggleCell} isPlantingMode={isPlantingMode} currentPlant={currentPlant} isErasing={isErasing} erasePlant={erasePlant} eraseLocation={eraseLocation} />
+                <TableGrid
+                    rows={rows}
+                    cols={cols}
+                    plantAssignments={plantAssignments}
+                    cellLocations={cellLocations}
+                    onCellClick={toggleCell}
+                    isPlantingMode={isPlantingMode}
+                    currentPlant={currentPlant}
+                    isErasing={isErasing}
+                    erasePlant={erasePlant}
+                    eraseLocation={eraseLocation}
+                />
             </div>
         </>
     );
