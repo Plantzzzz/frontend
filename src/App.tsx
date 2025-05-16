@@ -1,4 +1,3 @@
-import {useState} from "react";
 import {Route, Routes} from "react-router-dom";
 // Layouts
 import DashboardLayout from "./layouts/DashboardLayout.tsx";
@@ -28,8 +27,6 @@ import ProtectedRoute from "./scripts/ProtectedRoute.tsx";
 import "./App.css";
 
 function App() {
-    const [count, setCount] = useState(0);
-
     return (
         <>
             <ScrollToTop/>
