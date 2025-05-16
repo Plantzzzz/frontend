@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { db, auth } from '../../firebase'; // prilagodi pot do firebase.ts
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 
 const PlantRecognizer = () => {
   const [image, setImage] = useState<File | null>(null);
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -46,40 +47,35 @@ const PlantRecognizer = () => {
     }
   };
 
-    const savePlantToFirestore = async () => {
-    if (!result || !result.plantnet_result?.results?.length) {
-      alert('Ni rastline za shranjevanje!');
-      return;
-    }
+const savePlantToFirestore = async () => {
+  if (!result || !result.plantnet_result?.results?.length || !auth.currentUser) return;
 
-    const user = auth.currentUser;
-    if (!user) {
-      alert('Morate biti prijavljeni, da shranite rastlino.');
-      return;
-    }
-
-    const plant = result.plantnet_result.results[0];
-    const perenual = result.perenual_detail;
-
-    const plantData = {
-      userId: user.uid,
-      scientificName: plant.species?.scientificNameWithoutAuthor || '',
-      commonNames: plant.species?.commonNames || [],
-      description: plant.species?.description?.value || '',
-      distributionNative: plant.species?.distribution?.native || [],
-      score: plant.score,
-      perenualDetail: perenual || null,
-      createdAt: serverTimestamp(),
-    };
-
-    try {
-      const docRef = await addDoc(collection(db, 'savedPlants'), plantData);
-      alert(`Rastlina je bila shranjena! ID dokumenta: ${docRef.id}`);
-    } catch (error) {
-      alert('Napaka pri shranjevanju rastline: ' + (error as Error).message);
-    }
+  const plantData = {
+    userId: auth.currentUser.uid,
+    scientificName: result.plantnet_result.results[0].species?.scientificNameWithoutAuthor || '',
+    commonNames: result.plantnet_result.results[0].species?.commonNames || [],
+    score: result.plantnet_result.results[0].score || 0,
+    description: result.plantnet_result.results[0].species?.description?.value || '',
+    origin: result.plantnet_result.results[0].species?.distribution?.native || [],
+    watering: result.perenual_detail?.watering || '',
+    sunlight: result.perenual_detail?.sunlight || [],
+    cycle: result.perenual_detail?.cycle || '',
+    imageUploaded: image ? URL.createObjectURL(image) : '',
+    createdAt: new Date().toISOString(),
   };
 
+  try {
+    try {
+      await addDoc(collection(db, 'saved_plants'), plantData);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000); // Po 3s spet omogoči shranjevanje
+    } catch (error) {
+        console.error('Napaka pri shranjevanju:', error);
+  }
+  } catch(error){
+    console.error(error);
+  };
+  };
   return (
     <div className="min-h-screen bg-green-50 text-gray-900 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-xl bg-white rounded-xl shadow-md p-6 border border-green-200">
@@ -123,7 +119,7 @@ const PlantRecognizer = () => {
             <p className="text-green-600 italic mb-1">
               Verjetnost: {(result.plantnet_result.results[0].score * 100).toFixed(2)}%
             </p>
-        
+
             {result.plantnet_result.results[0].species?.commonNames?.length > 0 && (
               <p className="text-sm text-gray-700 mb-1">
                 🌱 Skupna imena: {result.plantnet_result.results[0].species.commonNames.join(', ')}
@@ -140,6 +136,18 @@ const PlantRecognizer = () => {
               <p className="text-xs text-gray-500 mt-2">
                 🌍 Izvor: {result.plantnet_result.results[0].species.distribution.native.join(', ')}
               </p>
+            )}
+
+            {/* Prikaži sliko, ki jo je uporabnik naložil */}
+            {image && (
+              <div className="mt-4">
+                <h4 className="text-md font-semibold mb-1 text-green-700">🖼️ Slika rastline:</h4>
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt="Vaša naložena rastlina"
+                  className="rounded-lg shadow-md max-w-xs"
+                />
+              </div>
             )}
 
             {/* Dodatne informacije iz Perenual */}
@@ -166,20 +174,22 @@ const PlantRecognizer = () => {
                 )}
               </div>
             )}
+
             {result.perenual_error && (
               <p className="text-red-600 mt-2">⚠️ {result.perenual_error}</p>
             )}
-        
-        
-           </div>
+
+              <button
+                onClick={savePlantToFirestore}
+                disabled={saved}
+                className={`mt-4 w-full font-semibold py-2 rounded-md transition-all duration-500
+                  ${saved ? 'bg-green-500 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+              >
+                {saved ? '✅ Uspešno shranjeno!' : '💾 Shrani med moje rastline'}
+              </button>
+          </div>
         )}
 
-          <button
-            onClick={savePlantToFirestore}
-            className="mt-4 w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            💾 Shrani rastlino
-          </button>
       </div>
     </div>
   );
