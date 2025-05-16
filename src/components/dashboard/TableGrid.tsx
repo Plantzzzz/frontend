@@ -1,57 +1,89 @@
-import React from "react";
-
-// Notes: add plants by clicking and dragging, make it a separate button (for example) and make maarking easy
+import React, { useState } from "react";
 
 interface TableGridProps {
     rows: number;
     cols: number;
-    selectedCells: Set<string>;
-    editMode: boolean;
     plantAssignments: { [key: string]: string };
-    cellLocations: { [key: string]: 'inside' | 'outside' };
+    cellLocations: { [key: string]: "inside" | "outside" };
     onCellClick: (row: number, col: number) => void;
+    isPlantingMode: boolean;
+    currentPlant: string | null;
+    isErasing: boolean;
+    eraseLocation: boolean;
+    erasePlant: boolean;
 }
 
 const TableGrid: React.FC<TableGridProps> = ({
                                                  rows,
                                                  cols,
-                                                 selectedCells,
-                                                 editMode,
                                                  plantAssignments,
                                                  cellLocations,
                                                  onCellClick,
                                              }) => {
+    const [isMouseDown, setIsMouseDown] = useState(false);
+
+    const handleMouseDown = (row: number, col: number) => {
+        setIsMouseDown(true);
+        onCellClick(row, col);
+    };
+
+    const handleMouseEnter = (row: number, col: number) => {
+        if (isMouseDown) {
+            onCellClick(row, col);
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsMouseDown(false);
+    };
+
+    const renderGrid = () => {
+        const rowsArray = [];
+
+        for (let r = 1; r <= rows; r++) {
+            const colsArray = [];
+            for (let c = 1; c <= cols; c++) {
+                const key = `${r}-${c}`;
+                const assignedPlant = plantAssignments[key];
+                const location = cellLocations[key];
+
+                let cellClass = "w-20 h-20 border flex items-center justify-center text-sm cursor-pointer ";
+                if (location === "inside") cellClass += "bg-blue-300 ";
+                else if (location === "outside") cellClass += "bg-yellow-300 ";
+                else cellClass += "bg-gray-200 ";
+
+                colsArray.push(
+                    <div
+                        key={key}
+                        className={cellClass}
+                        onMouseDown={() => handleMouseDown(r, c)}
+                        onMouseEnter={() => handleMouseEnter(r, c)}
+                        onMouseUp={handleMouseUp}
+                        title={assignedPlant || location || ""}
+                    >
+                        {assignedPlant && (
+                            <span className="text-black font-medium text-sm">{assignedPlant}</span>
+                        )}
+                    </div>
+                );
+            }
+            rowsArray.push(
+                <div key={r} className="flex">
+                    {colsArray}
+                </div>
+            );
+        }
+
+        return rowsArray;
+    };
+
     return (
-        <table className="table-auto border-collapse border border-gray-400 text-black">
-            <tbody>
-            {Array.from({ length: rows }).map((_, rowIndex) => (
-                <tr key={rowIndex}>
-                    {Array.from({ length: cols }).map((_, colIndex) => {
-                        const key = `${rowIndex}-${colIndex}`;
-                        const isSelected = selectedCells.has(key);
-
-                        const location = cellLocations[key];
-                        const baseColor = isSelected ? (editMode ? 'bg-yellow-300' : 'bg-blue-300') : 'bg-white';
-                        const locationColor = location === 'inside' ? 'bg-green-100' : location === 'outside' ? 'bg-red-100' : '';
-                        const cellClasses = `${baseColor} ${locationColor}`;
-
-                        return (
-                            <td
-                                key={colIndex}
-                                className={`border border-gray-400 px-4 py-2 text-center ${editMode || isSelected ? 'cursor-pointer' : ''} ${cellClasses}`}
-                                onClick={() => onCellClick(rowIndex, colIndex)}
-                            >
-                                <div>{`R${rowIndex + 1}C${colIndex + 1}`}</div>
-                                <div className="text-sm text-green-700">
-                                    {plantAssignments[key] || ''}
-                                </div>
-                            </td>
-                        );
-                    })}
-                </tr>
-            ))}
-            </tbody>
-        </table>
+        <div
+            className="select-none"
+            onMouseLeave={() => setIsMouseDown(false)}
+        >
+            {renderGrid()}
+        </div>
     );
 };
 

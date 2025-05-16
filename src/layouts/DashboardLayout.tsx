@@ -1,16 +1,29 @@
-import {Outlet} from 'react-router-dom'
-import Navbar from "../components/landingPage/Navbar.tsx";
+import { Outlet } from "react-router-dom";
+import Navbar from "../components/dashboard/Navbar.tsx";
+import Sidebar from "../components/dashboard/Sidebar.tsx";
 
 function DashboardLayout() {
     return (
-        <div className="dashboard-layout">
-            <div className="w-full fixed top-0 left-0 z-50">
-                <Navbar/>
-                {/*this is where the child page gets rendered*/}
-                <Outlet/>
+        <div className="flex flex-col min-h-screen overflow-auto bg-gray-900 text-white">
+            {/* Top Navbar */}
+            <header className="w-full bg-gray-800 z-50">
+                <Navbar />
+            </header>
+
+            {/* Sidebar + Main */}
+            <div className="flex flex-1 overflow-hidden">
+                {/* Sidebar */}
+                <aside className="w-64 bg-gray-800 overflow-y-auto">
+                    <Sidebar />
+                </aside>
+
+                {/* Page Content */}
+                <main className="flex-1 overflow-y-auto">
+                    <Outlet />
+                </main>
             </div>
         </div>
-    )
+    );
 }
 
 export default DashboardLayout;

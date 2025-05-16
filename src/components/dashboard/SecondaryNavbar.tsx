@@ -1,214 +1,245 @@
+// src/components/dashboard/SecondaryNavbar.tsx
 import React, { useState } from "react";
+import { Pencil, X, Eraser, Leaf, MapPin, Save } from "lucide-react";
 import TableGrid from "./TableGrid";
+import PlanterModal from "../../pages/dashboard/PlanterModal.tsx";
+import GridModal from "../../pages/dashboard/GridModal.tsx";
+
+interface SecondaryNavbarProps {
+    initialRows?: number;
+    initialCols?: number;
+    initialAssignments?: { [key: string]: string };
+    initialLocations?: { [key: string]: "inside" | "outside" };
+    onSave?: (data: {
+        rows: number;
+        cols: number;
+        plantAssignments: { [key: string]: string };
+        cellLocations: { [key: string]: "inside" | "outside" };
+    }) => void;
+}
 
 const plantOptions = ["Rosemary", "Thyme", "Basil"];
 
-const SecondaryNavbar: React.FC = () => {
-    const [rows, setRows] = useState(3);
-    const [cols, setCols] = useState(4);
-    const [showPopup, setShowPopup] = useState(false);
+const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
+                                                             initialRows = 3,
+                                                             initialCols = 4,
+                                                             initialAssignments = {},
+                                                             initialLocations = {},
+                                                             onSave
+                                                         }) => {
+    const [rows, setRows] = useState(initialRows);
+    const [cols, setCols] = useState(initialCols);
+    const [plantAssignments, setPlantAssignments] = useState(initialAssignments);
+    const [cellLocations, setCellLocations] = useState(initialLocations);
     const [editMode, setEditMode] = useState(false);
+    const [isPlantingMode, setIsPlantingMode] = useState(false);
+    const [currentPlant, setCurrentPlant] = useState<string | null>(null);
+    const [locationMode, setLocationMode] = useState<"inside" | "outside" | null>(null);
+    const [isErasing, setIsErasing] = useState(false);
+    const [eraseLocation, setEraseLocation] = useState(true);
+    const [erasePlant, setErasePlant] = useState(true);
+    const [showPopup, setShowPopup] = useState(false);
+    const [plantPickerOpen, setPlantPickerOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
     const [inputRows, setInputRows] = useState(rows);
     const [inputCols, setInputCols] = useState(cols);
-    const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
-    const [plantAssignments, setPlantAssignments] = useState<{ [key: string]: string }>({});
-    const [plantSelectionKey, setPlantSelectionKey] = useState<string | null>(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [cellLocations, setCellLocations] = useState<{ [key: string]: "inside" | "outside" }>({});
-    const [locationMode, setLocationMode] = useState<"inside" | "outside" | null>(null);
+    const [resizeDirection, setResizeDirection] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom');
 
     const handleApply = () => {
+        let newAssignments: { [key: string]: string } = {};
+        let newLocations: { [key: string]: "inside" | "outside" } = {};
+
+        Object.entries(plantAssignments).forEach(([key, value]) => {
+            const [r, c] = key.split("-").map(Number);
+            let newKey = key;
+
+            if (resizeDirection === "top") newKey = `${r + 1}-${c}`;
+            if (resizeDirection === "left") newKey = `${r}-${c + 1}`;
+
+            const [newR, newC] = newKey.split("-").map(Number);
+            if (newR <= inputRows && newC <= inputCols) newAssignments[newKey] = value;
+        });
+
+        Object.entries(cellLocations).forEach(([key, value]) => {
+            const [r, c] = key.split("-").map(Number);
+            let newKey = key;
+
+            if (resizeDirection === "top") newKey = `${r + 1}-${c}`;
+            if (resizeDirection === "left") newKey = `${r}-${c + 1}`;
+
+            const [newR, newC] = newKey.split("-").map(Number);
+            if (newR <= inputRows && newC <= inputCols) newLocations[newKey] = value;
+        });
+
         setRows(inputRows);
         setCols(inputCols);
+        setPlantAssignments(newAssignments);
+        setCellLocations(newLocations);
         setShowPopup(false);
-        setSelectedCells(new Set());
-        setPlantAssignments({});
-        setCellLocations({});
         setLocationMode(null);
+        setIsPlantingMode(false);
+        setCurrentPlant(null);
     };
 
     const toggleCell = (row: number, col: number) => {
         const key = `${row}-${col}`;
-        if (editMode) {
-            setSelectedCells(prev => {
-                const newSet = new Set(prev);
-                const wasSelected = newSet.has(key);
-                if (wasSelected) {
-                    newSet.delete(key);
-                    setPlantAssignments(prev => {
-                        const updated = { ...prev };
-                        delete updated[key];
-                        return updated;
-                    });
-                } else {
-                    newSet.add(key);
-                }
-                return newSet;
-            });
-        } else if (selectedCells.has(key)) {
-            if (locationMode) {
-                setCellLocations(prev => ({ ...prev, [key]: locationMode }));
-            } else {
-                setPlantSelectionKey(key);
-            }
+
+        if (isErasing) {
+            if (erasePlant) setPlantAssignments(prev => { const updated = { ...prev }; delete updated[key]; return updated; });
+            if (eraseLocation) setCellLocations(prev => { const updated = { ...prev }; delete updated[key]; return updated; });
+        } else if (isPlantingMode && currentPlant && cellLocations[key]) {
+            setPlantAssignments(prev => ({ ...prev, [key]: currentPlant }));
+        } else if (editMode && locationMode) {
+            setCellLocations(prev => ({ ...prev, [key]: locationMode }));
         }
     };
 
-    const assignPlant = (plant: string) => {
-        if (!plantSelectionKey) return;
-        setPlantAssignments(prev => ({ ...prev, [plantSelectionKey]: plant }));
-        setPlantSelectionKey(null);
-        setSearchTerm("");
-    };
-
-    const clearPlant = () => {
-        if (!plantSelectionKey) return;
-        setPlantAssignments(prev => {
-            const updated = { ...prev };
-            delete updated[plantSelectionKey];
-            return updated;
-        });
-        setPlantSelectionKey(null);
-        setSearchTerm("");
-    };
-
-    const filteredPlants = plantOptions.filter(plant =>
-        plant.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const buttonStyle = (active: boolean, base: string) =>
+        `${base} px-2 py-1 rounded flex items-center gap-1 font-semibold transition ${
+            active ? "ring-2 ring-white ring-offset-2 bg-opacity-100" : "bg-opacity-40"
+        }`;
 
     return (
         <>
-            <nav className="bg-gray-800 text-white px-6 py-4 flex flex-col gap-2 md:flex-row md:justify-between md:items-center">
-                <div className="text-lg font-bold">PetalBot</div>
-                <div className="space-x-2">
-                    <button
-                        className={`px-4 py-2 rounded ${editMode ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-500 hover:bg-gray-600'}`}
-                        onClick={() => setEditMode(!editMode)}
-                    >
-                        {editMode ? "Exit Edit Mode" : "Enter Edit Mode"}
-                    </button>
-                    <button
-                        className="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600"
-                        onClick={() => setShowPopup(true)}
-                    >
-                        Set Table Size
-                    </button>
-                    <label className="ml-4 inline-flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            checked={locationMode === "inside"}
-                            onChange={() => setLocationMode(prev => prev === "inside" ? null : "inside")}
-                        />
-                        <span>Mark as Inside</span>
-                    </label>
-                    <label className="inline-flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            checked={locationMode === "outside"}
-                            onChange={() => setLocationMode(prev => prev === "outside" ? null : "outside")}
-                        />
-                        <span>Mark as Outside</span>
-                    </label>
+            <nav className="bg-gray-800 text-white px-6 py-4 flex flex-col gap-3 md:flex-row md:justify-between md:items-center shadow-md">
+                <div className="flex flex-wrap justify-between items-center w-full text-sm">
+                    <div className="flex flex-wrap gap-3">
+                        <button className={buttonStyle(editMode, "bg-gray-600 hover:bg-red-600")} onClick={() => {
+                            setEditMode(prev => !prev);
+                            if (editMode) {
+                                setLocationMode(null);
+                                setIsErasing(false);
+                                setIsPlantingMode(false);
+                                setCurrentPlant(null);
+                            }
+                        }}>{editMode ? <X className="w-4 h-4" /> : <Pencil className="w-4 h-4" />} {editMode ? "Exit Edit Mode" : "Edit Mode"}</button>
+
+                        {editMode && (
+                            <>
+                                <button
+                                    onClick={() => {
+                                        setPlantPickerOpen(true);
+                                        // disable all other modes
+                                        setLocationMode(null);
+                                        setIsErasing(false);
+                                    }}
+                                    className="bg-green-600 hover:bg-green-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
+                                >
+                                    <Leaf className="w-4 h-4" /> Add Plants
+                                </button>
+
+                                {isPlantingMode && (
+                                    <button
+                                        onClick={() => {
+                                            setIsPlantingMode(false);
+                                            setCurrentPlant(null);
+                                        }}
+                                        className="bg-red-600 hover:bg-red-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
+                                    >
+                                        <X className="w-4 h-4" /> Stop Planting
+                                    </button>
+                                )}
+
+
+                                <div className="flex items-center gap-2 ml-2">
+                                    <span className="text-gray-300">Mark:</span>
+                                    <button
+                                        onClick={() => {
+                                            setLocationMode(prev => prev === "inside" ? null : "inside");
+                                            setIsPlantingMode(false);
+                                            setCurrentPlant(null);
+                                            setIsErasing(false);
+                                        }}
+                                        className={buttonStyle(locationMode === "inside", "bg-blue-600 hover:bg-blue-700")}
+                                    >
+                                        Inside
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+                                            setLocationMode(prev => prev === "outside" ? null : "outside");
+                                            setIsPlantingMode(false);
+                                            setCurrentPlant(null);
+                                            setIsErasing(false);
+                                        }}
+                                        className={buttonStyle(locationMode === "outside", "bg-yellow-500 hover:bg-yellow-600")}
+                                    >
+                                        Outside
+                                    </button>
+                                </div>
+
+                                <div className="flex items-center gap-2 ml-2">
+                                    <button
+                                        onClick={() => {
+                                            const newState = !isErasing;
+                                            setIsErasing(newState);
+                                            if (newState) {
+                                                setLocationMode(null);
+                                                setIsPlantingMode(false);
+                                                setCurrentPlant(null);
+                                            }
+                                        }}
+                                        className={buttonStyle(isErasing, "bg-red-500 hover:bg-red-600")}
+                                    >
+                                        <Eraser className="w-4 h-4" /> Eraser
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <div className="ml-auto flex gap-3">
+                        <button onClick={() => setShowPopup(true)} className="bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition">
+                            <MapPin className="w-4 h-4" /> Set Grid
+                        </button>
+                        {onSave && (
+                            <button onClick={() => onSave({ rows, cols, plantAssignments, cellLocations })} className="bg-green-600 hover:bg-green-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition">
+                                <Save className="w-4 h-4" /> Save Table
+                            </button>
+                        )}
+                    </div>
                 </div>
             </nav>
 
-            {showPopup && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded shadow-lg space-y-4 text-black">
-                        <h2 className="text-xl font-semibold">Set Table Size</h2>
-                        <div className="flex space-x-4">
-                            <label>
-                                Rows:
-                                <input
-                                    type="number"
-                                    min={1}
-                                    value={inputRows}
-                                    onChange={(e) => setInputRows(parseInt(e.target.value))}
-                                    className="border px-2 py-1 ml-2"
-                                />
-                            </label>
-                            <label>
-                                Columns:
-                                <input
-                                    type="number"
-                                    min={1}
-                                    value={inputCols}
-                                    onChange={(e) => setInputCols(parseInt(e.target.value))}
-                                    className="border px-2 py-1 ml-2"
-                                />
-                            </label>
-                        </div>
-                        <div className="flex justify-end space-x-2">
-                            <button
-                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                                onClick={() => setShowPopup(false)}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                onClick={handleApply}
-                            >
-                                Apply
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {plantPickerOpen && (
+                <PlanterModal
+                    plantOptions={plantOptions}
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    setCurrentPlant={setCurrentPlant}
+                    setIsPlantingMode={setIsPlantingMode}
+                    onClose={() => setPlantPickerOpen(false)}
+                />
             )}
 
-            {plantSelectionKey && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded shadow-lg space-y-4 text-black w-96">
-                        <h2 className="text-lg font-bold">Choose a plant for cell {plantSelectionKey}</h2>
-                        <input
-                            type="text"
-                            placeholder="Search plants..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full border border-gray-300 rounded px-3 py-1"
-                        />
-                        <ul className="max-h-48 overflow-y-auto space-y-2">
-                            {filteredPlants.map(plant => (
-                                <li key={plant}>
-                                    <button
-                                        className="w-full text-left bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                                        onClick={() => assignPlant(plant)}
-                                    >
-                                        {plant}
-                                    </button>
-                                </li>
-                            ))}
-                            {filteredPlants.length === 0 && (
-                                <li className="text-gray-500 italic">No plants found.</li>
-                            )}
-                        </ul>
-                        <div className="flex gap-2">
-                            <button
-                                className="mt-4 w-full bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 text-white"
-                                onClick={() => setPlantSelectionKey(null)}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="mt-4 w-full bg-red-500 px-4 py-2 text-white rounded hover:bg-red-600"
-                                onClick={clearPlant}
-                            >
-                                Remove Plant
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {showPopup && (
+                <GridModal
+                    inputRows={inputRows}
+                    inputCols={inputCols}
+                    rows={rows}
+                    cols={cols}
+                    resizeDirection={resizeDirection}
+                    setInputRows={setInputRows}
+                    setInputCols={setInputCols}
+                    setResizeDirection={setResizeDirection}
+                    onApply={handleApply}
+                    onClose={() => setShowPopup(false)}
+                />
             )}
+
 
             <div className="p-6 flex justify-center">
                 <TableGrid
                     rows={rows}
                     cols={cols}
-                    selectedCells={selectedCells}
-                    editMode={editMode}
                     plantAssignments={plantAssignments}
                     cellLocations={cellLocations}
                     onCellClick={toggleCell}
+                    isPlantingMode={isPlantingMode}
+                    currentPlant={currentPlant}
+                    isErasing={isErasing}
+                    erasePlant={erasePlant}
+                    eraseLocation={eraseLocation}
                 />
             </div>
         </>

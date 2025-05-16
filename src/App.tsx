@@ -6,29 +6,79 @@ import LandingPageLayout from "./layouts/LandingPageLayout.tsx";
 // Pages
 import RegisterPage from "./pages/landingPage/RegisterPage.tsx";
 import HomePage from "./pages/landingPage/HomePage.tsx";
-// Stylesheets
-import "./App.css";
+import SpacesPage from "./pages/dashboard/SpacesPage.tsx";
+import DashboardPage from "./pages/dashboard/DashboardPage.tsx";
+import PlantsPage from "./pages/dashboard/PlantsPage.tsx";
+import FeedingSchedulePage from "./pages/dashboard/FeedingSchedulePage.tsx";
+import ToDoPage from "./pages/dashboard/ToDoPage.tsx";
+import NotesPage from "./pages/dashboard/NotesPage.tsx";
+import AreasPage from "./pages/dashboard/AreasPage.tsx";
+import ImagesPage from "./pages/dashboard/ImagesPage.tsx";
+import AboutPage from "./pages/landingPage/AboutPage.tsx";
+import ContactPage from "./pages/landingPage/ContactPage.tsx";
+import DocsPage from "./pages/landingPage/DocsPage.tsx";
+import PrivacyTerms from "./pages/landingPage/PrivacyTerms.tsx";
+import {LoginForm} from "./components/landingPage/LoginForm.tsx";
+import UserPage from "./pages/dashboard/UserPage.tsx";
+
+// Scripts
+import {ScrollToTop} from "./scripts/ScrollToTop"; // adjust path if needed
+import ProtectedRoute from "./scripts/ProtectedRoute.tsx";
+
+// Components from feature/plantRecognition
 import SecondaryNavbar from "./components/dashboard/SecondaryNavbar.tsx";
 import TableGrid from "./components/dashboard/TableGrid.tsx";
 import PlantRecognizer from "./components/dashboard/PlantRecognizer.tsx";
+
+// Stylesheets
+import "./App.css";
 
 function App() {
     const [count, setCount] = useState(0);
 
     return (
-        <Routes>
-            <Route path="/dashboard" element={<DashboardLayout/>}>
-                <Route path="areas" element={<SecondaryNavbar/>}/>
-                {/*if you get any error on the line below, ignore it.*/}
-                <Route path="areas" element={<TableGrid/>}/>
-                <Route path="plantrecognition" element={<PlantRecognizer />} />
-            </Route>
+        <>
+            <ScrollToTop/>
+            <Routes>
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <DashboardLayout/>
+                        </ProtectedRoute>
+                    }
+                >
+                    <Route index element={<DashboardPage/>}/>
 
-            <Route path="/" element={<LandingPageLayout/>}>
-                <Route path="" element={<HomePage/>}/>
-                <Route path="register" element={<RegisterPage/>}/>
-            </Route>
-        </Routes>
+                    <Route path="spaces" element={<SpacesPage/>}/>
+                    <Route path="plants" element={<PlantsPage/>}/>
+                    <Route path="schedule" element={<FeedingSchedulePage/>}/>
+                    <Route path="todo" element={<ToDoPage/>}/>
+                    <Route path="notes" element={<NotesPage/>}/>
+                    <Route path="images" element={<ImagesPage/>}/>
+
+                    {/* Keeping the feature branch additions for areas */}
+                    <Route path="areas" element={<SecondaryNavbar/>}/>
+                    <Route path="areas" element={<TableGrid/>}/>
+                    {/* Existing AreasPage route also included */}
+                    <Route path="areas" element={<AreasPage/>}/>
+
+                    <Route path="plantrecognition" element={<PlantRecognizer />} />
+
+                    <Route path="user" element={<UserPage/>}/>
+                </Route>
+
+                <Route path="/landingPage" element={<LandingPageLayout/>}>
+                    <Route index element={<HomePage/>}/>
+                    <Route path="about" element={<AboutPage/>}/>
+                    <Route path="docs" element={<DocsPage/>}/>
+                    <Route path="contact" element={<ContactPage/>}/>
+                    <Route path="terms" element={<PrivacyTerms/>}/>
+                    <Route path="register" element={<RegisterPage/>}/>
+                    <Route path="login" element={<LoginForm/>}/>
+                </Route>
+            </Routes>
+        </>
     );
 }
 
