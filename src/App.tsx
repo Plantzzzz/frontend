@@ -18,8 +18,12 @@ import AboutPage from "./pages/landingPage/AboutPage.tsx";
 import ContactPage from "./pages/landingPage/ContactPage.tsx";
 import DocsPage from "./pages/landingPage/DocsPage.tsx";
 import PrivacyTerms from "./pages/landingPage/PrivacyTerms.tsx";
+import {LoginForm} from "./components/landingPage/LoginForm.tsx";
+import UserPage from "./pages/dashboard/UserPage.tsx";
+
 //Scripts
 import {ScrollToTop} from "./scripts/ScrollToTop"; // adjust path if needed
+import ProtectedRoute from "./scripts/ProtectedRoute.tsx";
 // Stylesheets
 import "./App.css";
 
@@ -30,7 +34,14 @@ function App() {
         <>
             <ScrollToTop/>
             <Routes>
-                <Route path="/dashboard" element={<DashboardLayout/>}>
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <DashboardLayout/>
+                        </ProtectedRoute>
+                    }
+                >
                     <Route index element={<DashboardPage/>}/>
 
                     <Route path="spaces" element={<SpacesPage/>}/>
@@ -39,8 +50,9 @@ function App() {
                     <Route path="todo" element={<ToDoPage/>}/>
                     <Route path="notes" element={<NotesPage/>}/>
                     <Route path="images" element={<ImagesPage/>}/>
-
                     <Route path="areas" element={<AreasPage/>}/>
+
+                    <Route path="user" element={<UserPage/>}/>
                 </Route>
 
                 <Route path="/landingPage" element={<LandingPageLayout/>}>
@@ -48,9 +60,11 @@ function App() {
 
                     <Route path="about" element={<AboutPage/>}/>
                     <Route path="docs" element={<DocsPage/>}/>
-                    <Route path="register" element={<RegisterPage/>}/>
                     <Route path="contact" element={<ContactPage/>}/>
                     <Route path="terms" element={<PrivacyTerms/>}/>
+
+                    <Route path="register" element={<RegisterPage/>}/>
+                    <Route path="login" element={<LoginForm/>}/>
                 </Route>
             </Routes>
         </>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { auth, googleProvider, facebookProvider } from '../../firebase.ts';
 import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
+import { Link } from 'react-router-dom'; // Add this line
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' });
@@ -46,7 +47,7 @@ const RegisterForm = () => {
     try {
       setLoading(true);
       await signInWithPopup(auth, facebookProvider);
-      console.log('Facebok auth successful');
+      console.log('Facebook auth successful');
     } catch (err) {
       setError('Error with Facebook auth: ' + (err as Error).message);
     } finally {
@@ -94,7 +95,7 @@ const RegisterForm = () => {
           </form>
 
           <div className="mt-1">
-            <p className="text-center text-gray-500 text-sm mb-3">... or use social a media account</p>
+            <p className="text-center text-gray-500 text-sm mb-3">... or use a social media account</p>
             <div className="flex gap-4 justify-center">
               <button
                   onClick={handleGoogleLogin}
@@ -112,6 +113,14 @@ const RegisterForm = () => {
               </button>
             </div>
           </div>
+
+          {/* ✅ Login Link */}
+          <p className="mt-6 text-center text-sm text-gray-600">
+            Already have an account?{' '}
+            <Link to="/landingPage/login" className="text-green-600 hover:underline">
+              Login here
+            </Link>
+          </p>
         </div>
       </div>
   );
