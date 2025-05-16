@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect  } from "react";
 import TableGrid from "./TableGrid";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase"; // pot do tvoje konfiguracije
 
-const plantOptions = ["Rosemary", "Thyme", "Basil"];
+//const plantOptions = ["Rosemary", "Thyme", "Basil"];
 
 const SecondaryNavbar: React.FC = () => {
     const [rows, setRows] = useState(3);
     const [cols, setCols] = useState(4);
+    const [plantOptions, setPlantOptions] = useState<string[]>([]);
     const [showPopup, setShowPopup] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [inputRows, setInputRows] = useState(rows);
@@ -26,6 +29,25 @@ const SecondaryNavbar: React.FC = () => {
         setCellLocations({});
         setLocationMode(null);
     };
+
+    // 🔥 Naloži rastline iz Firestore
+    useEffect(() => {
+        const fetchPlants = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "plants"));
+                const names: string[] = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.name) names.push(data.name);
+                });
+                setPlantOptions(names);
+            } catch (error) {
+                console.error("Napaka pri pridobivanju rastlin:", error);
+            }
+        };
+
+        fetchPlants();
+    }, []);
 
     const toggleCell = (row: number, col: number) => {
         const key = `${row}-${col}`;
