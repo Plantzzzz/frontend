@@ -21,9 +21,15 @@ import PrivacyTerms from "./pages/landingPage/PrivacyTerms.tsx";
 import {LoginForm} from "./components/landingPage/LoginForm.tsx";
 import UserPage from "./pages/dashboard/UserPage.tsx";
 
-//Scripts
+// Scripts
 import {ScrollToTop} from "./scripts/ScrollToTop"; // adjust path if needed
 import ProtectedRoute from "./scripts/ProtectedRoute.tsx";
+
+// Components from feature/plantRecognition
+import SecondaryNavbar from "./components/dashboard/SecondaryNavbar.tsx";
+import TableGrid from "./components/dashboard/TableGrid.tsx";
+import PlantRecognizer from "./components/dashboard/PlantRecognizer.tsx";
+
 // Stylesheets
 import "./App.css";
 
@@ -50,19 +56,24 @@ function App() {
                     <Route path="todo" element={<ToDoPage/>}/>
                     <Route path="notes" element={<NotesPage/>}/>
                     <Route path="images" element={<ImagesPage/>}/>
+
+                    {/* Keeping the feature branch additions for areas */}
+                    <Route path="areas" element={<SecondaryNavbar/>}/>
+                    <Route path="areas" element={<TableGrid/>}/>
+                    {/* Existing AreasPage route also included */}
                     <Route path="areas" element={<AreasPage/>}/>
+
+                    <Route path="plantrecognition" element={<PlantRecognizer />} />
 
                     <Route path="user" element={<UserPage/>}/>
                 </Route>
 
                 <Route path="/landingPage" element={<LandingPageLayout/>}>
                     <Route index element={<HomePage/>}/>
-
                     <Route path="about" element={<AboutPage/>}/>
                     <Route path="docs" element={<DocsPage/>}/>
                     <Route path="contact" element={<ContactPage/>}/>
                     <Route path="terms" element={<PrivacyTerms/>}/>
-
                     <Route path="register" element={<RegisterPage/>}/>
                     <Route path="login" element={<LoginForm/>}/>
                 </Route>
