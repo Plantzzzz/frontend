@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { auth, googleProvider, facebookProvider } from '../../firebase.ts';
-import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup, getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
 import { Link } from 'react-router-dom'; // Add this line
 
@@ -8,6 +8,7 @@ const RegisterForm = () => {
   const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,14 +33,21 @@ const RegisterForm = () => {
   };
 
   const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    provider.addScope("https://www.googleapis.com/auth/calendar");
+    const auth = getAuth();
+
     try {
-      setLoading(true);
-      await signInWithPopup(auth, googleProvider);
-      console.log('Google auth successful');
-    } catch (err) {
-      setError('Error with Google auth: ' + (err as Error).message);
-    } finally {
-      setLoading(false);
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const accessToken = credential?.accessToken;
+      if (accessToken) {
+        localStorage.setItem("calendarToken", accessToken);
+        setToken(accessToken);
+        console.log("Google Calendar Access Token:", accessToken);
+      }
+    } catch (error) {
+      console.error("Google login error", error);
     }
   };
 
