@@ -1,4 +1,3 @@
-import {useState} from "react";
 import {Route, Routes} from "react-router-dom";
 // Layouts
 import DashboardLayout from "./layouts/DashboardLayout.tsx";
@@ -34,8 +33,6 @@ import PlantRecognizer from "./components/dashboard/PlantRecognizer.tsx";
 import "./App.css";
 
 function App() {
-    const [count, setCount] = useState(0);
-
     return (
         <>
             <ScrollToTop/>
