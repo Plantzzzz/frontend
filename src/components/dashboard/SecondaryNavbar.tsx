@@ -1,9 +1,11 @@
 // src/components/dashboard/SecondaryNavbar.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect  } from "react";
 import { Pencil, X, Eraser, Leaf, MapPin, Save } from "lucide-react";
 import TableGrid from "./TableGrid";
 import PlanterModal from "../../pages/dashboard/PlanterModal.tsx";
 import GridModal from "../../pages/dashboard/GridModal.tsx";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 
 interface SecondaryNavbarProps {
     initialRows?: number;
@@ -18,7 +20,7 @@ interface SecondaryNavbarProps {
     }) => void;
 }
 
-const plantOptions = ["Rosemary", "Thyme", "Basil"];
+//const plantOptions = ["Rosemary", "Thyme", "Basil"];
 
 const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                                                              initialRows = 3,
@@ -29,6 +31,7 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                                                          }) => {
     const [rows, setRows] = useState(initialRows);
     const [cols, setCols] = useState(initialCols);
+    const [plantOptions, setPlantOptions] = useState<string[]>([]);
     const [plantAssignments, setPlantAssignments] = useState(initialAssignments);
     const [cellLocations, setCellLocations] = useState(initialLocations);
     const [editMode, setEditMode] = useState(false);
@@ -80,6 +83,25 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
         setIsPlantingMode(false);
         setCurrentPlant(null);
     };
+
+    // Naloži rastline iz Firestore
+    useEffect(() => {
+        const fetchPlants = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "plants"));
+                const names: string[] = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.name) names.push(data.name);
+                });
+                setPlantOptions(names);
+            } catch (error) {
+                console.error("Napaka pri pridobivanju rastlin:", error);
+            }
+        };
+
+        fetchPlants();
+    }, []);
 
     const toggleCell = (row: number, col: number) => {
         const key = `${row}-${col}`;
