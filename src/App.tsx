@@ -54,10 +54,6 @@ function App() {
                     <Route path="notes" element={<NotesPage/>}/>
                     <Route path="images" element={<ImagesPage/>}/>
 
-                    {/* Keeping the feature branch additions for areas */}
-                    <Route path="areas" element={<SecondaryNavbar/>}/>
-                    <Route path="areas" element={<TableGrid/>}/>
-                    {/* Existing AreasPage route also included */}
                     <Route path="areas" element={<AreasPage/>}/>
 
                     <Route path="plantrecognition" element={<PlantRecognizer />} />
