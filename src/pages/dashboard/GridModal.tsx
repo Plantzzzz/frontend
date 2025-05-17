@@ -16,8 +16,6 @@ interface SetGridPopupProps {
 }
 
 const SetGridPopup: React.FC<SetGridPopupProps> = ({
-                                                       inputRows,
-                                                       inputCols,
                                                        rows,
                                                        cols,
                                                        resizeDirection,
