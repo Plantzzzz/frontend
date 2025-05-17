@@ -214,11 +214,21 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                         <button onClick={() => setShowPopup(true)} className="bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition">
                             <MapPin className="w-4 h-4" /> Set Grid
                         </button>
-                        {onSave && (
-                            <button onClick={() => onSave({ rows, cols, plantAssignments, cellLocations })} className="bg-green-600 hover:bg-green-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition">
-                                <Save className="w-4 h-4" /> Save Table
-                            </button>
-                        )}
+                        <button
+                            onClick={() => {
+                                const data = { rows, cols, plantAssignments, cellLocations };
+                                if (onSave) {
+                                    onSave(data);
+                                } else {
+                                    console.log("Save clicked:", data);
+                                    alert("No save handler provided. Data logged to console.");
+                                }
+                            }}
+                            className="bg-green-600 hover:bg-green-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
+                        >
+                            <Save className="w-4 h-4" /> Save Table
+                        </button>
+
                     </div>
                 </div>
             </nav>
