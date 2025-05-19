@@ -25,8 +25,6 @@ import {ScrollToTop} from "./scripts/ScrollToTop"; // adjust path if needed
 import ProtectedRoute from "./scripts/ProtectedRoute.tsx";
 
 // Components from feature/plantRecognition
-import SecondaryNavbar from "./components/dashboard/SecondaryNavbar.tsx";
-import TableGrid from "./components/dashboard/TableGrid.tsx";
 import PlantRecognizer from "./components/dashboard/PlantRecognizer.tsx";
 
 // Stylesheets
