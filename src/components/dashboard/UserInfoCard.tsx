@@ -1,24 +1,43 @@
 import React from "react";
+import ProfileImageUploader from "./ProfileImageUploader"; // Adjust path if needed
 
 const UserInfoCard: React.FC = () => {
     const user = JSON.parse(sessionStorage.getItem("user") || "{}");
 
     return (
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Account Information</h2>
-            <div className="space-y-2 text-sm">
-                <p><span className="font-medium">Email:</span> {user.email || "N/A"}</p>
-                <p><span className="font-medium">UID:</span> {user.uid || "N/A"}</p>
-                <p><span className="font-medium">Verified:</span> {user.emailVerified ? "Yes" : "No"}</p>
-                <p><span className="font-medium">Display Name:</span> {user.displayName || "N/A"}</p>
+        <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-white shadow-xl rounded-2xl p-6 w-full max-w-lg mx-auto transition-all duration-300">
+            <div className="flex items-center gap-5 mb-6">
+                {user.profileImage ? (
+                    <img
+                        src={user.profileImage}
+                        alt="User profile"
+                        className="w-20 h-20 rounded-full object-cover ring-2 ring-offset-2 ring-gray-300 dark:ring-gray-700"
+                    />
+                ) : (
+                    <div className="w-20 h-20 rounded-full bg-gray-600 flex items-center justify-center text-white text-sm font-semibold">
+                        No Image
+                    </div>
+                )}
+                <div className="flex flex-col">
+                    <h2 className="text-xl font-bold tracking-tight">
+                        {user.username || "Unnamed User"}
+                    </h2>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {user.email || "No email provided"}
+                    </span>
+                </div>
             </div>
-            {user.photoURL && (
-                <img
-                    src={user.photoURL}
-                    alt="Profile"
-                    className="mt-4 rounded-full w-24 h-24 object-cover border-2 border-gray-600"
-                />
-            )}
+
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3 text-sm">
+                <div className="flex justify-between">
+                    <span className="font-medium text-gray-600 dark:text-gray-300">UID</span>
+                    <span className="text-gray-700 dark:text-gray-200">
+                        {user.uid || "Not available"}
+                    </span>
+                </div>
+            </div>
+
+            <ProfileImageUploader />
         </div>
     );
 };
