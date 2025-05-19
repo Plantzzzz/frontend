@@ -49,12 +49,11 @@ const RegisterForm = () => {
 
 
     const handleGoogleLogin = async () => {
-        const provider = new GoogleAuthProvider();
-        provider.addScope("https://www.googleapis.com/auth/calendar");
+        googleProvider.addScope("https://www.googleapis.com/auth/calendar");
         const auth = getAuth();
 
         try {
-            const result = await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, googleProvider);
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const accessToken = credential?.accessToken;
             if (accessToken) {
