@@ -3,6 +3,8 @@ import { auth, googleProvider, facebookProvider } from '../../firebase.ts';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../../firebase"; // adjust path if needed
 
 export const LoginForm = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -11,18 +13,37 @@ export const LoginForm = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Used to redirect the user to their intended page after login
     const from = (location.state as any)?.from?.pathname || '/dashboard';
 
-    const handleSuccess = (user: any) => {
+    // After successful login, this function fetches extended user profile data from Firestore
+    const handleSuccess = async (user: any) => {
+        // Fetch the user's profile from Firestore using their UID
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
+
+        let username = null;
+        let profileImage = null;
+
+        // If the user profile document exists, extract the custom fields
+        if (snap.exists()) {
+            const data = snap.data();
+            username = data.username;
+            profileImage = data.profileImage;
+        }
+
+        // We store a full user object including custom Firestore data in session storage
         const userData = {
             uid: user.uid,
             email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
+            username: username ?? "Unknown",
+            profileImage: profileImage ?? "",
             emailVerified: user.emailVerified,
         };
+
+        // Save user data to session storage so it can be accessed throughout the app
         console.log("Saving user to session:", userData);
-        sessionStorage.setItem('user', JSON.stringify(userData));
+        sessionStorage.setItem("user", JSON.stringify(userData));
         navigate(from, { replace: true });
     };
 

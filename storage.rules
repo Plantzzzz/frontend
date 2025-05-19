@@ -1,0 +1,12 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow a user to read/write their own profile image. Since the endpoint is /profileImages/uid
+    match /profileImages/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId
+    }
+  }
+}
+
+// any changes to this must be applied via firebase deploy --only storage... ugh
