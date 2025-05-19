@@ -5,7 +5,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const user = sessionStorage.getItem('user');
 
     if (!user) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/landingPage/login" replace />;
     }
 
     return <>{children}</>;
