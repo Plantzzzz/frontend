@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/icon2.png";
 
-const baseURL = "/landingPage";
+const baseURL = "";
 
 const Navbar: React.FC = () => {
     return (

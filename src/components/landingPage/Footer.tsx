@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const baseURL = "/landingPage";
+const baseURL = "";
 
 export const Footer = () => (
     <footer className="bg-black text-white px-6 md:px-12 py-16">

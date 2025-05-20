@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 
-const baseURL = "/landingPage";
+const baseURL = "";
 
 export const CTASection = () => (
     <>

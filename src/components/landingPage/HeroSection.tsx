@@ -12,7 +12,7 @@ export const HeroSection = () => (
             <p className="text-gray-300 max-w-2xl mb-6 text-lg leading-relaxed">
                 Petal Bot is your personalized AI-powered garden assistant designed to help your plants thrive. From tips to tracking, it's everything in one place.
             </p>
-            <Link to="/landingPage/about" className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition">Learn More</Link>
+            <Link to="/about" className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition">Learn More</Link>
         </div>
     </section>
 );
