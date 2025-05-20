@@ -1,8 +1,8 @@
 // pages/dashboard/PlantNotesAndTodos.tsx
 import React, { useState } from "react";
-import PlantNoteEditor from "../../components/dashboard/PlantNoteEditor.tsx";
-import PlantList from "../../components/dashboard/PlantList.tsx";
-import PlantTodoList from "../../components/dashboard/PlantTodoList.tsx";
+import PlantNoteEditor from "../../components/dashboard/PlantNoteEditor";
+import SimplePlantSelector from "../../components/dashboard/SimplePlantSelector";
+import PlantTodoList from "../../components/dashboard/PlantTodoList";
 
 interface GroupedPlant {
     key: string;
@@ -11,12 +11,15 @@ interface GroupedPlant {
     cells: string[];
 }
 
-const NotesPage: React.FC = () => {
+const PlantNotesAndTodosPage: React.FC = () => {
     const [selected, setSelected] = useState<GroupedPlant | null>(null);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto p-6">
-            <PlantList selected={selected} onSelect={setSelected} />
+            <SimplePlantSelector
+                onSelect={(plant) => setSelected(plant)}
+                selectedKey={selected?.key || ""}
+            />
             <div className="space-y-6">
                 {selected ? (
                     <>
@@ -31,4 +34,4 @@ const NotesPage: React.FC = () => {
     );
 };
 
-export default NotesPage;
+export default PlantNotesAndTodosPage;
