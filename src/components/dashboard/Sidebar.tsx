@@ -106,7 +106,7 @@ const MySidebar = () => {
                         }`}
                     >
                         <SidebarLink to={`${dirRoot}/schedule`} icon={HiOutlineCalendar} label="Feeding Schedule"/>
-                        <SidebarLink to={`${dirRoot}/todo`} icon={HiOutlineClipboardCheck} label="ToDo"/>
+                        {/*<SidebarLink to={`${dirRoot}/todo`} icon={HiOutlineClipboardCheck} label="ToDo"/>*/}
                         <SidebarLink to={`${dirRoot}/notes`} icon={HiOutlineDocumentText} label="Notes"/>
                         <SidebarLink to={`${dirRoot}/images`} icon={HiOutlinePhoto} label="Images"/>
                     </div>

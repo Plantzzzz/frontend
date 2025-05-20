@@ -1,11 +1,12 @@
-import React from 'react';
+import React from "react";
+import PlantImageUploader from "../../components/dashboard/PlantImageUploader.tsx";
 
 const ImagesPage: React.FC = () => {
     return (
-        <div>
-            <h1>Images</h1>
+        <div className="max-w-4xl mx-auto p-6">
+            <PlantImageUploader />
         </div>
     );
-}
+};
 
 export default ImagesPage;

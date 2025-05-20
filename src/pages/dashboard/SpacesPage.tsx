@@ -28,6 +28,7 @@ const SpacesPage: React.FC = () => {
     const [spaces, setSpaces] = useState<Space[]>([]);
     const [newSpaceName, setNewSpaceName] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const user = JSON.parse(sessionStorage.getItem("user") || "{}");
@@ -46,6 +47,7 @@ const SpacesPage: React.FC = () => {
     const handleCreateSpace = async () => {
         if (!newSpaceName.trim() || !user?.uid) return;
 
+        setLoading(true);
         const newDoc = await addDoc(collection(db, "spaces"), {
             userId: user.uid,
             name: newSpaceName.trim(),
@@ -73,6 +75,7 @@ const SpacesPage: React.FC = () => {
         ]);
 
         setNewSpaceName("");
+        setLoading(false);
     };
 
     const handleDelete = async (id: string) => {
@@ -94,48 +97,64 @@ const SpacesPage: React.FC = () => {
 
     return (
         <div className="max-w-screen-xl mx-auto px-4 py-8 text-white">
-            <h1 className="text-4xl font-bold mb-6">My Garden Spaces</h1>
-
-            <div className="flex flex-col md:flex-row gap-4 mb-8">
-                <input
-                    type="text"
-                    placeholder="New space name"
-                    value={newSpaceName}
-                    onChange={(e) => setNewSpaceName(e.target.value)}
-                    className="w-full md:w-1/3 px-4 py-2 rounded-md border border-gray-600 bg-gray-900 text-white"
-                />
-                <Button color="success" onClick={handleCreateSpace}>
-                    + Add Space
-                </Button>
-                <input
-                    type="text"
-                    placeholder="Search spaces..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full md:w-1/3 px-4 py-2 rounded-md border border-gray-600 bg-gray-900 text-white"
-                />
+            {/* Create & Search Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        placeholder="New space name"
+                        value={newSpaceName}
+                        onChange={(e) => setNewSpaceName(e.target.value)}
+                        className="flex-grow px-4 py-2 rounded-md border border-gray-600 bg-gray-900 text-white"
+                    />
+                    <Button
+                        color="success"
+                        onClick={handleCreateSpace}
+                        disabled={!newSpaceName.trim() || loading}
+                    >
+                        + Add
+                    </Button>
+                </div>
+                <div className="md:col-span-2">
+                    <input
+                        type="text"
+                        placeholder="Search spaces..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full px-4 py-2 rounded-md border border-gray-600 bg-gray-900 text-white"
+                    />
+                </div>
             </div>
 
+            {/* Spaces Display */}
             {filteredSpaces.length === 0 ? (
-                <p className="text-gray-400 italic">No spaces found.</p>
+                <div className="text-center py-20 text-gray-500 border border-gray-700 rounded-lg">
+                    <p className="text-lg">No spaces found.</p>
+                    <p className="text-sm">Try creating one or adjusting your search.</p>
+                </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredSpaces.map((space) => (
                         <div
                             key={space.id}
-                            className="bg-gray-800 rounded-lg p-5 flex flex-col justify-between shadow transition hover:shadow-lg"
+                            className="bg-gray-800 rounded-lg p-5 flex flex-col justify-between shadow transition hover:shadow-lg hover:bg-gray-700"
                         >
                             <div>
                                 <h2 className="text-xl font-semibold mb-1">{space.name}</h2>
-                                <p className="text-sm text-gray-400 mb-4">
+                                <p className="text-xs text-gray-400">
                                     ID: {space.id.slice(0, 8)}...
                                 </p>
                             </div>
-                            <div className="flex justify-end gap-2 mt-auto">
+                            <div className="flex justify-between gap-2 mt-6">
                                 <Button color="blue" onClick={() => handleView(space.id)} size="sm">
                                     View
                                 </Button>
-                                <Button color="failure" onClick={() => handleDelete(space.id)} size="sm">
+                                <Button
+                                    color="failure"
+                                    onClick={() => handleDelete(space.id)}
+                                    size="sm"
+                                    title="Delete Space"
+                                >
                                     <Trash2 className="w-4 h-4" />
                                 </Button>
                             </div>
