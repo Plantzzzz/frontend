@@ -1,9 +1,10 @@
 import React from 'react';
+import GroupedPlantList from "../../components/dashboard/GroupedPlantList.tsx";
 
 const NotesPage: React.FC = () => {
     return (
         <div>
-            <h1>Notes</h1>
+            <GroupedPlantList />
         </div>
     );
 }

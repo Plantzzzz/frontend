@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
     HiOutlineViewGrid,
     HiChevronDown,
@@ -8,85 +7,110 @@ import {
     HiOutlineCalendar,
     HiCollection,
 } from "react-icons/hi";
-import { HiOutlinePhoto } from "react-icons/hi2";
-import { GiFlowerPot } from "react-icons/gi";
-import { Link, useLocation } from "react-router-dom";
+import {HiOutlinePhoto} from "react-icons/hi2";
+import {GiFlowerPot} from "react-icons/gi";
+import {useEffect, useState} from "react";
+import {useLocation, Link} from "react-router-dom";
 
-const MySidebar = () => {
-    const [openGarden, setOpenGarden] = useState(true);
-    const [openCollections, setOpenCollections] = useState(false);
-    const dirRoot = "/dashboard";
+const SidebarLink = ({to, icon: Icon, label}: { to: string; icon: any; label: string }) => {
     const location = useLocation();
+    const isActive = location.pathname === to;
 
     return (
-        <aside className="w-64 bg-gray-900 text-white h-full p-4 border-r border-gray-700">
-            <nav className="space-y-2 text-sm font-medium">
+        <Link
+            to={to}
+            className={`flex items-center gap-2 px-3 py-2 rounded transition-colors ${
+                isActive
+                    ? "bg-green-50/10 text-green-300"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
+            }`}
+        >
+            <Icon className="text-lg"/>
+            {label}
+        </Link>
+    );
+};
+
+const MySidebar = () => {
+    const dirRoot = "/dashboard";
+    const location = useLocation();
+    const [openGarden, setOpenGarden] = useState(false);
+    const [openCollections, setOpenCollections] = useState(false);
+
+    useEffect(() => {
+        setOpenGarden(location.pathname.startsWith(`${dirRoot}/spaces`) || location.pathname.startsWith(`${dirRoot}/plants`));
+        setOpenCollections(
+            location.pathname.startsWith(`${dirRoot}/schedule`) ||
+            location.pathname.startsWith(`${dirRoot}/todo`) ||
+            location.pathname.startsWith(`${dirRoot}/notes`) ||
+            location.pathname.startsWith(`${dirRoot}/images`)
+        );
+    }, [location.pathname]);
+
+    return (
+        <aside className="w-64 bg-gray-900 text-white h-full p-4 border-r border-gray-700 overflow-y-auto">
+            <nav className="space-y-3 text-sm font-medium">
+
                 {/* Dashboard */}
-                <Link
-                    to={`${dirRoot}`}
-                    className={`flex items-center gap-2 p-2 rounded font-semibold hover:bg-gray-800 ${
-                        location.pathname === dirRoot ? "bg-green-600/30 text-green-300" : "text-white"
-                    }`}
-                >
-                    <HiOutlineViewGrid className="text-xl" />
-                    Dashboard
-                </Link>
+                <SidebarLink to={`${dirRoot}`} icon={HiOutlineViewGrid} label="Dashboard"/>
 
                 {/* My Garden */}
-                <button
-                    onClick={() => setOpenGarden(!openGarden)}
-                    className="flex w-full items-center justify-between p-2 hover:bg-gray-800 rounded text-white"
-                >
-                    <span className="flex items-center gap-2 font-semibold ">
-                        <HiCollection className="text-xl" />
-                        My Garden
-                    </span>
-                    {openGarden ? <HiChevronUp /> : <HiChevronDown />}
-                </button>
-                {openGarden && (
-                    <div className="ml-6 space-y-1">
-                        <Link to={`${dirRoot}/spaces`} className="flex items-center gap-2 p-1 text-gray-300 hover:bg-gray-800 rounded">
-                            <HiOutlineViewGrid />
-                            Spaces
-                        </Link>
-                        <Link to={`${dirRoot}/plants`} className="flex items-center gap-2 p-1 hover:bg-gray-800 rounded">
-                            <GiFlowerPot />
-                            Plants
-                        </Link>
+                <div>
+                    <button
+                        onClick={() => setOpenGarden(!openGarden)}
+                        className={`flex w-full items-center justify-between px-3 py-2 rounded font-semibold transition-colors ${
+                            location.pathname.startsWith(`${dirRoot}/spaces`) ||
+                            location.pathname.startsWith(`${dirRoot}/plants`)
+                                ? "bg-green-600/30 text-green-300"
+                                : "text-white hover:bg-gray-800"
+                        }`}
+                    >
+                        <span className="flex items-center gap-2">
+                            <HiCollection className="text-lg"/>
+                            My Garden
+                        </span>
+                        {openGarden ? <HiChevronUp/> : <HiChevronDown/>}
+                    </button>
+                    <div
+                        className={`ml-4 mt-1 space-y-1 overflow-hidden transition-all duration-300 ${
+                            openGarden ? "max-h-40" : "max-h-0"
+                        }`}
+                    >
+                        <SidebarLink to={`${dirRoot}/spaces`} icon={HiOutlineViewGrid} label="Spaces"/>
+                        <SidebarLink to={`${dirRoot}/plants`} icon={GiFlowerPot} label="Plants"/>
                     </div>
-                )}
+                </div>
 
                 {/* Collections */}
-                <button
-                    onClick={() => setOpenCollections(!openCollections)}
-                    className="flex w-full items-center justify-between p-2 hover:bg-gray-800 rounded text-white"
-                >
-                    <span className="flex items-center gap-2 font-semibold">
-                        <HiOutlineClipboardCheck className="text-xl" />
-                        Collections
-                    </span>
-                    {openCollections ? <HiChevronUp /> : <HiChevronDown />}
-                </button>
-                {openCollections && (
-                    <div className="ml-6 space-y-1">
-                        <Link to={`${dirRoot}/schedule`} className="flex items-center gap-2 p-1 hover:bg-gray-800 rounded">
-                            <HiOutlineCalendar />
-                            Feeding Schedule
-                        </Link>
-                        <Link to={`${dirRoot}/todo`} className="flex items-center gap-2 p-1 hover:bg-gray-800 rounded">
-                            <HiOutlineClipboardCheck />
-                            ToDo
-                        </Link>
-                        <Link to={`${dirRoot}/notes`} className="flex items-center gap-2 p-1 hover:bg-gray-800 rounded">
-                            <HiOutlineDocumentText />
-                            Notes
-                        </Link>
-                        <Link to={`${dirRoot}/images`} className="flex items-center gap-2 p-1 hover:bg-gray-800 rounded">
-                            <HiOutlinePhoto />
-                            Images
-                        </Link>
+                <div>
+                    <button
+                        onClick={() => setOpenCollections(!openCollections)}
+                        className={`flex w-full items-center justify-between px-3 py-2 rounded font-semibold transition-colors ${
+                            location.pathname.startsWith(`${dirRoot}/schedule`) ||
+                            location.pathname.startsWith(`${dirRoot}/todo`) ||
+                            location.pathname.startsWith(`${dirRoot}/notes`) ||
+                            location.pathname.startsWith(`${dirRoot}/images`)
+                                ? "bg-green-600/30 text-green-300"
+                                : "text-white hover:bg-gray-800"
+                        }`}
+                    >
+                        <span className="flex items-center gap-2">
+                            <HiOutlineClipboardCheck className="text-lg"/>
+                            Collections
+                        </span>
+                        {openCollections ? <HiChevronUp/> : <HiChevronDown/>}
+                    </button>
+                    <div
+                        className={`ml-4 mt-1 space-y-1 overflow-hidden transition-all duration-300 ${
+                            openCollections ? "max-h-64" : "max-h-0"
+                        }`}
+                    >
+                        <SidebarLink to={`${dirRoot}/schedule`} icon={HiOutlineCalendar} label="Feeding Schedule"/>
+                        <SidebarLink to={`${dirRoot}/todo`} icon={HiOutlineClipboardCheck} label="ToDo"/>
+                        <SidebarLink to={`${dirRoot}/notes`} icon={HiOutlineDocumentText} label="Notes"/>
+                        <SidebarLink to={`${dirRoot}/images`} icon={HiOutlinePhoto} label="Images"/>
                     </div>
-                )}
+                </div>
             </nav>
         </aside>
     );

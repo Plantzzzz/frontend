@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import logo from "../../assets/icon2.png";
 
 const Navbar: React.FC = () => {
@@ -7,6 +7,7 @@ const Navbar: React.FC = () => {
     const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     const email = user?.email || "Email";
     const username = user?.username || "Guest";
+    const profileImage = user?.profileImage || "";
 
     const handleProfileClick = () => {
         navigate("/dashboard/user");
@@ -15,8 +16,8 @@ const Navbar: React.FC = () => {
     return (
         <nav className="bg-white border-gray-200 dark:bg-gray-900">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <img src={logo} className="h-8" />
+                <a href="/dashboard" className="flex items-center space-x-3 rtl:space-x-reverse">
+                    <img src={logo} className="h-8"/>
                     <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
                         PetalBot
                     </span>
@@ -25,9 +26,10 @@ const Navbar: React.FC = () => {
                     <button
                         onClick={handleProfileClick}
                         type="button"
-                        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                        className="flex items-center gap-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                     >
-                        {username}
+                        <img src={profileImage} alt="Profile" className="w-8 h-8 rounded-full object-cover"/>
+                        <span>{username}</span>
                     </button>
                     <button
                         data-collapse-toggle="navbar-cta"
