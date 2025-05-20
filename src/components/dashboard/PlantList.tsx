@@ -1,25 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { auth, db } from "../../firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+    collection,
+    getDocs,
+    query,
+    where,
+    doc,
+    getDoc,
+} from "firebase/firestore";
+import PlantProfileModal from "./PlantProfileModal";
 
 interface GroupedPlant {
     key: string;
     plant: string;
     location: string;
     cells: string[];
+    image?: string;
 }
 
-interface Props {
-    selected: GroupedPlant | null;
-    onSelect: (group: GroupedPlant) => void;
-}
-
-const PlantList: React.FC<Props> = ({ selected, onSelect }) => {
+const PlantList: React.FC = () => {
     const [groups, setGroups] = useState<GroupedPlant[]>([]);
+    const [selected, setSelected] = useState<GroupedPlant | null>(null);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (!user) return;
 
             const q = query(collection(db, "spaces"), where("userId", "==", user.uid));
@@ -27,7 +31,7 @@ const PlantList: React.FC<Props> = ({ selected, onSelect }) => {
 
             const allGroups: Record<string, GroupedPlant> = {};
 
-            snap.forEach((docSnap) => {
+            for (const docSnap of snap.docs) {
                 const data = docSnap.data();
                 const plantAssignments = data.tableData?.plantAssignments || {};
                 const cellLocations = data.tableData?.cellLocations || {};
@@ -38,11 +42,20 @@ const PlantList: React.FC<Props> = ({ selected, onSelect }) => {
 
                     const key = `${plant}_${location}`;
                     if (!allGroups[key]) {
-                        allGroups[key] = { key, plant, location, cells: [] };
+                        const plantDocQuery = query(
+                            collection(db, "plants"),
+                            where("common_name", "==", plant)
+                        );
+                        const plantSnap = await getDocs(plantDocQuery);
+                        const image = plantSnap.empty
+                            ? "https://source.unsplash.com/300x200/?plant"
+                            : plantSnap.docs[0].data().image;
+
+                        allGroups[key] = { key, plant, location, cells: [], image };
                     }
                     allGroups[key].cells.push(cell);
                 }
-            });
+            }
 
             setGroups(Object.values(allGroups));
         });
@@ -51,22 +64,29 @@ const PlantList: React.FC<Props> = ({ selected, onSelect }) => {
     }, []);
 
     return (
-        <div>
-            <h2 className="text-lg font-semibold mb-4">Plants by Location</h2>
-            <ul className="space-y-2">
-                {groups.map((group) => (
-                    <li key={group.key}>
-                        <button
-                            onClick={() => onSelect(group)}
-                            className={`w-full text-left px-4 py-2 border rounded-md ${
-                                selected?.key === group.key ? "bg-green-100" : ""
-                            }`}
-                        >
-                            {group.plant} ({group.location})
-                        </button>
-                    </li>
-                ))}
-            </ul>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-w-6xl mx-auto px-4 py-6">
+            {groups.map((group) => (
+                <div
+                    key={group.key}
+                    className="bg-gray-800 rounded-lg overflow-hidden shadow hover:shadow-lg transition cursor-pointer"
+                    onClick={() => setSelected(group)}
+                >
+                    <img
+                        src={group.image || "https://source.unsplash.com/300x200/?plant"}
+                        alt={group.plant}
+                        className="w-full h-40 object-cover"
+                    />
+                    <div className="p-4">
+                        <h3 className="text-lg font-semibold text-white">{group.plant}</h3>
+                        <p className="text-sm text-gray-400">Location: {group.location}</p>
+                        <p className="text-sm text-gray-500">Cells: {group.cells.length}</p>
+                    </div>
+                </div>
+            ))}
+
+            {selected && (
+                <PlantProfileModal plant={selected} onClose={() => setSelected(null)} />
+            )}
         </div>
     );
 };
