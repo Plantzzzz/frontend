@@ -64,7 +64,7 @@ const PlantCountChart: React.FC = () => {
     }, []);
 
     return (
-        <div className="bg-gray-800 rounded-lg p-6 shadow-lg mt-8">
+        <div>
             <h2 className="text-xl font-semibold mb-4 text-white">Plant Type Frequency</h2>
             {loading ? (
                 <p className="text-gray-400 text-center">Loading...</p>
@@ -72,11 +72,11 @@ const PlantCountChart: React.FC = () => {
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={plantData} margin={{ top: 20, right: 20, left: 0, bottom: 40 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" angle={-20} textAnchor="end" interval={0} />
+                        <XAxis dataKey="name"  textAnchor="end" interval={0} />
                         <YAxis allowDecimals={false} />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="count" fill="#34d399" />
+                        <Bar dataKey="count" fill="#4ade80" />
                     </BarChart>
                 </ResponsiveContainer>
             )}

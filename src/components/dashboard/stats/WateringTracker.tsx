@@ -60,7 +60,7 @@ const WateringTracker: React.FC = () => {
     }
 
     return (
-        <div className="bg-gray-800 rounded-lg p-6 shadow-lg text-center mt-6">
+        <div className="text-center mt-6">
             <h2 className="text-xl font-semibold mb-4 text-white">Zalivanje rastlin</h2>
             <p className="text-white mb-2">
                 🌱 Zaporednih dni zalivanja: <strong>{wateringStreak}</strong>

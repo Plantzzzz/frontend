@@ -1,16 +1,16 @@
 import React from "react";
 import GridLayout from "react-grid-layout";
-import IndoorOutdoorPieChart from "./stats/IndoorOutdoorPieChart";
-import PlantCountChart from "./stats/PlantCountChart";
-import WateringTracker from "./stats/WateringTracker";
+import IndoorOutdoorPieChart from "../../components/dashboard/stats/IndoorOutdoorPieChart";
+import PlantCountChart from "../../components/dashboard/stats/PlantCountChart";
+import WateringTracker from "../../components/dashboard/stats/WateringTracker";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
 const PlantStatsDashboard: React.FC = () => {
     const layout = [
+        { i: "watering", x: 0, y: 1, w: 12, h: 2 },
         { i: "pie", x: 0, y: 0, w: 6, h: 4 },
         { i: "bar", x: 6, y: 0, w: 6, h: 4 },
-        { i: "watering", x: 0, y: 1, w: 12, h: 2 },
     ];
 
     return (
@@ -25,20 +25,23 @@ const PlantStatsDashboard: React.FC = () => {
                 width={1200}
                 draggableHandle=".drag-handle"
             >
+                <div key="watering" className="bg-gray-800 rounded-lg p-4 shadow-lg">
+                    <div className="drag-handle cursor-move font-bold mb-2">↕ Watering Tracker</div>
+                    <WateringTracker />
+                </div>
                 <div key="pie" className="bg-gray-800 rounded-lg p-4 shadow-lg">
                     <div className="drag-handle cursor-move font-bold mb-2">↕ Pie Chart</div>
                     <IndoorOutdoorPieChart />
                 </div>
 
                 <div key="bar" className="bg-gray-800 rounded-lg p-4 shadow-lg">
-                    <div className="drag-handle cursor-move font-bold mb-2">↕ Bar Chart</div>
-                    <PlantCountChart />
+                    <div className="drag-handle cursor-move font-bold mb-2">↕ Bar Chart
+                        <PlantCountChart />
+                    </div>
+                    
                 </div>
 
-                <div key="watering" className="bg-gray-800 rounded-lg p-4 shadow-lg">
-                    <div className="drag-handle cursor-move font-bold mb-2">↕ Watering Tracker</div>
-                    <WateringTracker />
-                </div>
+
             </GridLayout>
         </div>
     );

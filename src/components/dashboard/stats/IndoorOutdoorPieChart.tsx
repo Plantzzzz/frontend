@@ -68,7 +68,7 @@ const IndoorOutdoorPieChart: React.FC = () => {
     if (loading) return <p className="text-center text-gray-400">Loading...</p>;
 
     return (
-        <div className="bg-gray-800 rounded-lg p-6 shadow-lg mb-6">
+        <div >
             <h2 className="text-xl font-semibold mb-4 text-white">Indoor vs Outdoor Cells</h2>
             <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
