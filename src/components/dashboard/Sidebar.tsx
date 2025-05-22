@@ -9,6 +9,8 @@ import {
 } from "react-icons/hi";
 import {HiOutlinePhoto} from "react-icons/hi2";
 import {GiFlowerPot} from "react-icons/gi";
+import { PiGraphThin } from "react-icons/pi";
+import { FaMagnifyingGlass } from "react-icons/fa6";
 import {useEffect, useState} from "react";
 import {useLocation, Link} from "react-router-dom";
 
@@ -78,6 +80,8 @@ const MySidebar = () => {
                     >
                         <SidebarLink to={`${dirRoot}/spaces`} icon={HiOutlineViewGrid} label="Spaces"/>
                         <SidebarLink to={`${dirRoot}/plants`} icon={GiFlowerPot} label="Plants"/>
+                        <SidebarLink to={`${dirRoot}/stats` } icon={PiGraphThin} label="Statistics" />
+                        <SidebarLink to={`${dirRoot}/plantRecognition` } icon={FaMagnifyingGlass} label="Plant recognition" />
                     </div>
                 </div>
 

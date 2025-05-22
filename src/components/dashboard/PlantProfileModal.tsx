@@ -135,7 +135,7 @@ const PlantProfileModal: React.FC<Props> = ({ plant, onClose }) => {
                         <div><p className="font-semibold text-white">Growth Rate</p><p>{refData?.growth_rate}</p></div>
                         <div><p className="font-semibold text-white">Care Level</p><p>{refData?.care_level}</p></div>
                         <div><p className="font-semibold text-white">Watering</p><p>{refData?.watering}</p></div>
-                        <div><p className="font-semibold text-white">Sunlight</p><p>{refData?.sunlight?.join(", ")}</p></div>
+                        <div><p className="font-semibold text-white">Sunlight</p><p>{refData?.sunlight}</p></div>
                         <div className="col-span-3"><p className="font-semibold text-white">Assigned Cells</p><p className="text-gray-400 text-sm">{plant.cells.join(", ")}</p></div>
                     </div>
 
