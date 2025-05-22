@@ -29,6 +29,7 @@ import PlantRecognizer from "./components/dashboard/PlantRecognizer.tsx";
 
 // Stylesheets
 import "./App.css";
+import PlantStatsDashboard from "./pages/dashboard/PlantStats.tsx";
 
 function App() {
     return (
@@ -57,6 +58,7 @@ function App() {
                     <Route path="plantrecognition" element={<PlantRecognizer />} />
 
                     <Route path="user" element={<UserPage/>}/>
+                    <Route path="stats" element={<PlantStatsDashboard />} />
                 </Route>
 
                 <Route path="/" element={<LandingPageLayout/>}>
