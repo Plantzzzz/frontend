@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { db, auth } from '../../firebase';
 import { addDoc, collection } from 'firebase/firestore';
+import { storage } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 
 const PlantRecognizer = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -47,9 +50,16 @@ const PlantRecognizer = () => {
     }
   };
 
-  const savePlantToFirestore = async () => {
-    if (!result || !result.plantnet_result?.results?.length || !auth.currentUser) return;
+const savePlantToFirestore = async () => {
+  if (!result || !result.plantnet_result?.results?.length || !auth.currentUser || !image) return;
 
+  try {
+    // 1. Najprej naloži sliko v Firebase Storage
+    const storageRef = ref(storage, `plant_images/${auth.currentUser.uid}/${Date.now()}_${image.name}`);
+    await uploadBytes(storageRef, image);
+    const imageUrl = await getDownloadURL(storageRef); // pridobi URL naložene slike
+
+    // 2. Nato shrani vse skupaj v Firestore
     const plantData = {
       userId: auth.currentUser.uid,
       scientificName: result.plantnet_result.results[0].species?.scientificNameWithoutAuthor || '',
@@ -60,18 +70,21 @@ const PlantRecognizer = () => {
       watering: result.perenual_detail?.watering || '',
       sunlight: result.perenual_detail?.sunlight || [],
       cycle: result.perenual_detail?.cycle || '',
-      imageUploaded: image ? URL.createObjectURL(image) : '',
+      imageUploaded: imageUrl, // uporabi pravi URL
       createdAt: new Date().toISOString(),
     };
 
-    try {
-      await addDoc(collection(db, 'saved_plants'), plantData);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    } catch (error) {
-      console.error('Napaka pri shranjevanju:', error);
-    }
-  };
+    await addDoc(collection(db, 'saved_plants'), plantData);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  } catch (error) {
+    console.error('Napaka pri shranjevanju:', error);
+    console.log("UID:", auth.currentUser?.uid);
+console.log("Storage path:", `plant_images/${auth.currentUser?.uid}/${Date.now()}_${image.name}`);
+
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 flex items-center justify-center px-4 py-8">
