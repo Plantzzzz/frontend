@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { auth, googleProvider, facebookProvider } from '../../firebase.ts';
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, getAuth, GoogleAuthProvider} from 'firebase/auth';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
-import { getDoc, doc } from "firebase/firestore";
-import { db } from "../../firebase"; // adjust path if needed
 
 export const LoginForm = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -12,38 +10,20 @@ export const LoginForm = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const [token, setToken] = useState<string | null>(null);
 
-    // Used to redirect the user to their intended page after login
     const from = (location.state as any)?.from?.pathname || '/dashboard';
 
-    // After successful login, this function fetches extended user profile data from Firestore
-    const handleSuccess = async (user: any) => {
-        // Fetch the user's profile from Firestore using their UID
-        const userRef = doc(db, "users", user.uid);
-        const snap = await getDoc(userRef);
-
-        let username = null;
-        let profileImage = null;
-
-        // If the user profile document exists, extract the custom fields
-        if (snap.exists()) {
-            const data = snap.data();
-            username = data.username;
-            profileImage = data.profileImage;
-        }
-
-        // We store a full user object including custom Firestore data in session storage
+    const handleSuccess = (user: any) => {
         const userData = {
             uid: user.uid,
             email: user.email,
-            username: username ?? "Unknown",
-            profileImage: profileImage ?? "",
+            displayName: user.displayName,
+            photoURL: user.photoURL,
             emailVerified: user.emailVerified,
         };
-
-        // Save user data to session storage so it can be accessed throughout the app
         console.log("Saving user to session:", userData);
-        sessionStorage.setItem("user", JSON.stringify(userData));
+        sessionStorage.setItem('user', JSON.stringify(userData));
         navigate(from, { replace: true });
     };
 
@@ -63,18 +43,25 @@ export const LoginForm = () => {
         }
     };
 
-    const handleGoogleLogin = async () => {
-        try {
-            setLoading(true);
-            const result = await signInWithPopup(auth, googleProvider);
-            console.log('Google login successful');
-            handleSuccess(result.user);
-        } catch (err) {
-            setError('Google login error: ' + (err as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    provider.addScope("https://www.googleapis.com/auth/calendar");
+    const auth = getAuth();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const accessToken = credential?.accessToken;
+      if (accessToken) {
+        localStorage.setItem("calendarToken", accessToken);
+        setToken(accessToken);
+        console.log("Google Calendar Access Token:", accessToken);
+      }
+        handleSuccess(result.user);
+    } catch (error) {
+      console.error("Google login error", error);
+    }
+  };
 
     const handleFacebookLogin = async () => {
         try {
@@ -142,7 +129,7 @@ export const LoginForm = () => {
 
                 <p className="mt-6 text-center text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <Link to="/register" className="text-green-600 hover:underline">
+                    <Link to="/landingPage/register" className="text-green-600 hover:underline">
                         Register here
                     </Link>
                 </p>

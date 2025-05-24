@@ -72,7 +72,7 @@ const PlantCountChart: React.FC = () => {
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={plantData} margin={{ top: 20, right: 20, left: 0, bottom: 40 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name"  textAnchor="end" interval={0} />
+                        <XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} />
                         <YAxis allowDecimals={false} />
                         <Tooltip />
                         <Legend />

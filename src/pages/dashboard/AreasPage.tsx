@@ -71,6 +71,7 @@ const AreasPage: React.FC = () => {
 
     return (
         <SecondaryNavbar
+            spaceId={spaceId}  // <-- TUKAJ dodamo
             initialRows={initialData.rows}
             initialCols={initialData.cols}
             initialAssignments={initialData.plantAssignments}

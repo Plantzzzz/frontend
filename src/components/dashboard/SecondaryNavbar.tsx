@@ -3,11 +3,15 @@ import React, { useState, useEffect  } from "react";
 import { Pencil, X, Eraser, Leaf, MapPin, Save } from "lucide-react";
 import TableGrid from "./TableGrid";
 import PlanterModal from "../../pages/dashboard/PlanterModal.tsx";
+import PlantEventModal from "../dashboard/PlantEventModal.tsx"
 import GridModal from "../../pages/dashboard/GridModal.tsx";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
+import { generateWateringEventsForSpace } from "../../scripts/wateringService";
+import { getPlantRecommendations } from "../../scripts/recommendationService.ts";
 
 interface SecondaryNavbarProps {
+    spaceId?: string;  // <-- dodamo optional prop
     initialRows?: number;
     initialCols?: number;
     initialAssignments?: { [key: string]: string };
@@ -23,6 +27,7 @@ interface SecondaryNavbarProps {
 //const plantOptions = ["Rosemary", "Thyme", "Basil"];
 
 const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
+                                                             spaceId,
                                                              initialRows = 3,
                                                              initialCols = 4,
                                                              initialAssignments = {},
@@ -47,6 +52,16 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
     const [inputRows, setInputRows] = useState(rows);
     const [inputCols, setInputCols] = useState(cols);
     const [resizeDirection, setResizeDirection] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom');
+    const [selectedCell, setSelectedCell] = useState<string | null>(null);
+    const [eventModalOpen, setEventModalOpen] = useState(false);
+    const [recommendations, setRecommendations] = useState<string[]>([]);
+    const [recModalOpen, setRecModalOpen] = useState(false);
+
+    const handleRecommendations = async () => {
+        const recs = await getPlantRecommendations(spaceId!);
+        setRecommendations(recs);
+        setRecModalOpen(true);
+    };
 
     const handleApply = () => {
         let newAssignments: { [key: string]: string } = {};
@@ -106,6 +121,11 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
     const toggleCell = (row: number, col: number) => {
         const key = `${row}-${col}`;
 
+        if (!editMode && plantAssignments[key]) {
+            setSelectedCell(key);
+            setEventModalOpen(true);
+            return;
+        }
         if (isErasing) {
             if (erasePlant) setPlantAssignments(prev => { const updated = { ...prev }; delete updated[key]; return updated; });
             if (eraseLocation) setCellLocations(prev => { const updated = { ...prev }; delete updated[key]; return updated; });
@@ -120,6 +140,30 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
         `${base} px-2 py-1 rounded flex items-center gap-1 font-semibold transition ${
             active ? "ring-2 ring-white ring-offset-2 bg-opacity-100" : "bg-opacity-40"
         }`;
+
+    const handleEventSubmit = async ({ eventType, notes }: { eventType: string; notes: string }) => {
+        if (!selectedCell || !plantAssignments[selectedCell] || !spaceId) return;
+
+        const plantName = plantAssignments[selectedCell];
+
+        try {
+            await addDoc(collection(db, `spaces/${spaceId}/plantEvents`), {
+                cellId: selectedCell,
+                plantName,
+                eventType,
+                notes,
+                timestamp: serverTimestamp(),
+            });
+            alert("Dogodek uspešno shranjen.");
+            console.log("Shranjujem dogodek v spaceId:", spaceId);
+        } catch (error) {
+            console.error("Napaka pri shranjevanju dogodka:", error);
+            alert("Napaka pri shranjevanju.");
+        }
+
+        setEventModalOpen(false);
+        setSelectedCell(null);
+    };
 
     return (
         <>
@@ -228,6 +272,24 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                         >
                             <Save className="w-4 h-4" /> Save Table
                         </button>
+                        <button
+                            onClick={() => {
+                                if (!spaceId) {
+                                alert("Manjka spaceId.");
+                                return;
+                                }
+                                console.log("➡️ Kličem generateWateringEventsForSpace za:", spaceId);
+                            generateWateringEventsForSpace(spaceId);
+                            }}
+                            className="bg-indigo-600 hover:bg-indigo-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
+                            >💧 Ustvari zalivalne dogodke
+                        </button>
+                        <button onClick={handleRecommendations} className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded">
+                        💡 Prikaži priporočila
+                        </button>
+
+
+
 
                     </div>
                 </div>
@@ -259,6 +321,15 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                 />
             )}
 
+            {eventModalOpen && selectedCell && (
+                <PlantEventModal
+                    cellId={selectedCell}
+                    plantName={plantAssignments[selectedCell]}
+                    onClose={() => setEventModalOpen(false)}
+                    onSubmit={handleEventSubmit}
+        	    />
+            )}
+
 
             <div className="p-6 flex justify-center">
                 <TableGrid
@@ -274,6 +345,18 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                     eraseLocation={eraseLocation}
                 />
             </div>
+            {recModalOpen && (
+                <div className="fixed top-1/4 left-1/2 transform -translate-x-1/2 bg-black text-white p-4 shadow-xl rounded-xl max-w-md z-50">
+                    <h2 className="text-lg font-bold mb-2">🌿 Priporočila</h2>
+                    <ul className="text-sm list-disc pl-5">
+                        {recommendations.map((r, idx) => (
+                            <li key={idx}>{r}</li>
+                        ))}
+                    </ul>
+                    <button onClick={() => setRecModalOpen(false)} className="mt-4 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Zapri</button>
+                </div>
+            )}
+
         </>
     );
 };
