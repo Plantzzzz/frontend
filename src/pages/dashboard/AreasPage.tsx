@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import SecondaryNavbar from "../../components/dashboard/SecondaryNavbar";
+import PlantCareBubble from "../../components/dashboard/PlantCareBubble";
 
 interface TableData {
     rows: number;
@@ -18,6 +19,13 @@ const AreasPage: React.FC = () => {
 
     const [initialData, setInitialData] = useState<TableData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [careInstructions, setCareInstructions] = useState<string>("");
+
+
+    const handlePlantCareInfo = (info: string) => {
+        setCareInstructions(info);
+        setTimeout(() => setCareInstructions(""), 20000); // Oblaček izgine po 10s (po želji)
+    };
 
     useEffect(() => {
         const fetchTable = async () => {
@@ -70,14 +78,19 @@ const AreasPage: React.FC = () => {
     }
 
     return (
-        <SecondaryNavbar
-            spaceId={spaceId}  // <-- TUKAJ dodamo
-            initialRows={initialData.rows}
-            initialCols={initialData.cols}
-            initialAssignments={initialData.plantAssignments}
-            initialLocations={initialData.cellLocations}
-            onSave={handleSave}
-        />
+        <div>
+            <SecondaryNavbar
+                spaceId={spaceId}
+                initialRows={initialData.rows}
+                initialCols={initialData.cols}
+                initialAssignments={initialData.plantAssignments}
+                initialLocations={initialData.cellLocations}
+                onSave={handleSave}
+                onPlantCareInfo={handlePlantCareInfo} // ✅ dodamo ta prop
+            />
+
+            {careInstructions && <PlantCareBubble message={careInstructions} />}
+        </div>
     );
 };
 
