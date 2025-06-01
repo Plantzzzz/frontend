@@ -8,7 +8,7 @@ import HomePage from "./pages/landingPage/HomePage.tsx";
 import SpacesPage from "./pages/dashboard/SpacesPage.tsx";
 import DashboardPage from "./pages/dashboard/DashboardPage.tsx";
 import PlantsPage from "./pages/dashboard/PlantsPage.tsx";
-import FeedingSchedulePage from "./pages/dashboard/FeedingSchedulePage.tsx";
+import SeasonalCalendar from "./pages/dashboard/SeasonalTips.tsx";
 import ToDoPage from "./pages/dashboard/ToDoPage.tsx";
 import NotesPage from "./pages/dashboard/NotesPage.tsx";
 import AreasPage from "./pages/dashboard/AreasPage.tsx";
@@ -48,7 +48,7 @@ function App() {
 
                     <Route path="spaces" element={<SpacesPage/>}/>
                     <Route path="plants" element={<PlantsPage/>}/>
-                    <Route path="schedule" element={<FeedingSchedulePage/>}/>
+                    <Route path="tips" element={<SeasonalCalendar/>}/>
                     <Route path="todo" element={<ToDoPage/>}/>
                     <Route path="notes" element={<NotesPage/>}/>
                     <Route path="images" element={<ImagesPage/>}/>

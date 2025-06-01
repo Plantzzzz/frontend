@@ -21,22 +21,22 @@ const PlantEventModal: React.FC<PlantEventModalProps> = ({ cellId, plantName, on
                 <h2 className="text-xl font-semibold">Dodaj dogodek za {plantName} ({cellId})</h2>
 
                 <label className="block">
-                    Vrsta dogodka:
+                    Event type:
                     <select
                         value={eventType}
                         onChange={(e) => setEventType(e.target.value)}
                         className="w-full mt-1 border p-2 rounded"
                     >
-                        <option value="planting">Zasaditev</option>
-                        <option value="watering">Zalivanje</option>
-                        <option value="fertilizing">Gnojenje</option>
-                        <option value="trimming">Obrezovanje</option>
-                        <option value="harvest">Obiranje</option>
+                        <option value="planting">Planting</option>
+                        <option value="watering">Wattering</option>
+                        <option value="fertilizing">Fertalizing</option>
+                        <option value="trimming">Trimming</option>
+                        <option value="harvest">Harvesting</option>
                     </select>
                 </label>
 
                 <label className="block">
-                    Opombe:
+                    Remarks:
                     <textarea
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
@@ -50,7 +50,7 @@ const PlantEventModal: React.FC<PlantEventModalProps> = ({ cellId, plantName, on
                         className="bg-green-600 px-4 py-2 rounded text-white"
                         onClick={() => onSubmit({ eventType, notes })}
                     >
-                        Shrani
+                        Save
                     </button>
                 </div>
             </div>

@@ -42,7 +42,7 @@ const MySidebar = () => {
     useEffect(() => {
         setOpenGarden(location.pathname.startsWith(`${dirRoot}/spaces`) || location.pathname.startsWith(`${dirRoot}/plants`));
         setOpenCollections(
-            location.pathname.startsWith(`${dirRoot}/schedule`) ||
+            location.pathname.startsWith(`${dirRoot}/tips`) ||
             location.pathname.startsWith(`${dirRoot}/todo`) ||
             location.pathname.startsWith(`${dirRoot}/notes`) ||
             location.pathname.startsWith(`${dirRoot}/images`)
@@ -90,7 +90,7 @@ const MySidebar = () => {
                     <button
                         onClick={() => setOpenCollections(!openCollections)}
                         className={`flex w-full items-center justify-between px-3 py-2 rounded font-semibold transition-colors ${
-                            location.pathname.startsWith(`${dirRoot}/schedule`) ||
+                            location.pathname.startsWith(`${dirRoot}/tips`) ||
                             location.pathname.startsWith(`${dirRoot}/todo`) ||
                             location.pathname.startsWith(`${dirRoot}/notes`) ||
                             location.pathname.startsWith(`${dirRoot}/images`)
@@ -109,7 +109,7 @@ const MySidebar = () => {
                             openCollections ? "max-h-64" : "max-h-0"
                         }`}
                     >
-                        <SidebarLink to={`${dirRoot}/schedule`} icon={HiOutlineCalendar} label="Feeding Schedule"/>
+                        <SidebarLink to={`${dirRoot}/tips`} icon={HiOutlineCalendar} label="Seasonal Tips"/>
                         {/*<SidebarLink to={`${dirRoot}/todo`} icon={HiOutlineClipboardCheck} label="ToDo"/>*/}
                         <SidebarLink to={`${dirRoot}/notes`} icon={HiOutlineDocumentText} label="Notes"/>
                         <SidebarLink to={`${dirRoot}/images`} icon={HiOutlinePhoto} label="Images"/>
