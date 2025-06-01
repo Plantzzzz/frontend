@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 type WateringEvent = {
@@ -17,6 +17,44 @@ function normalizeName(name: string): string {
 function formatDate(date: Date): string {
   return date.toISOString().split("T")[0];
 }
+
+export const getSpaceLocation = async (spaceId: string) => {
+  const ref = doc(db, "spaces", spaceId);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    throw new Error("Prostor ne obstaja ali nima določene lokacije.");
+  }
+
+  const data = snap.data();
+  if (typeof data.latitude !== "number" || typeof data.longitude !== "number") {
+    throw new Error("Prostor nima pravilno nastavljenih koordinat.");
+  }
+
+  return { latitude: data.latitude, longitude: data.longitude };
+};
+
+/**
+ * Pridobi vremensko napoved za določene koordinate
+ */
+export const fetchWeatherData = async (lat: number, lon: number) => {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,weathercode&hourly=precipitation&forecast_days=1&timezone=auto`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Napaka pri pridobivanju vremena");
+  return await res.json();
+};
+
+
+export const shouldWaterOutsidePlants = async (userId: string): Promise<boolean> => {
+  const { latitude, longitude } = await getSpaceLocation(userId);
+  const weather = await fetchWeatherData(latitude, longitude);
+
+  // Preveri, ali bo v naslednjih urah deževalo
+  const precipitationNextHours = weather.hourly.precipitation.slice(0, 6); // naslednjih 6 ur
+  const rainExpected = precipitationNextHours.some((val: number) => val > 0.5); // prag 0.5mm
+
+  return !rainExpected; // če dežuje, ne zalivamo
+};
 
 export async function generateWateringEventsForSpace(spaceId: string) {
   console.log("🌿 [START] Generiram zalivalne dogodke za space:", spaceId);

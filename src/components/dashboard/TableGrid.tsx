@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { fetchWeatherData, getSpaceLocation } from "../../scripts/wateringService";
 
 interface TableGridProps {
+    spaceId: string; // ✅ DODAJ TO
     rows: number;
     cols: number;
     plantAssignments: { [key: string]: string };
@@ -14,6 +16,7 @@ interface TableGridProps {
 }
 
 const TableGrid: React.FC<TableGridProps> = ({
+                                                spaceId,
                                                  rows,
                                                  cols,
                                                  plantAssignments,
@@ -26,7 +29,59 @@ const TableGrid: React.FC<TableGridProps> = ({
         setIsMouseDown(true);
         onCellClick(row, col);
     };
+    
+    const [weather, setWeather] = useState<null | {
+        temperature: number;
+        precipitation: number;
+        weatherCode: number;
+    }>(null);
 
+    const [rainExpected, setRainExpected] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        const fetchWeather = async () => {
+            try {
+                console.log("📡 Pridobivam vreme za spaceId:", spaceId);
+
+                const { latitude, longitude } = await getSpaceLocation(spaceId);
+                console.log("📍 Lokacija prostora:", latitude, longitude);
+
+                const data = await fetchWeatherData(latitude, longitude);
+                console.log("🌦️ Podatki o vremenu:", data);
+
+                setWeather({
+                    temperature: data.current.temperature_2m,
+                    precipitation: data.current.precipitation,
+                    weatherCode: data.current.weathercode,
+                });
+
+                const next6Hours = data.hourly.precipitation.slice(0, 6);
+                const significantRain = next6Hours.some((val: number) => val >= 0.5);
+                setRainExpected(significantRain);
+            } catch (error: any) {
+                console.error("❌ Napaka pri pridobivanju vremena:", error);
+                alert("❌ Napaka: " + error.message);
+            }
+        };
+
+        if (spaceId) {
+            fetchWeather();
+        } else {
+            console.warn("⚠️ Manjka spaceId!");
+        }
+    }, [spaceId]);
+
+    const getWeatherIcon = (code: number) => {
+        if ([0].includes(code)) return "☀️";
+        if ([1, 2].includes(code)) return "🌤️";
+        if ([3].includes(code)) return "☁️";
+        if ([45, 48].includes(code)) return "🌫️";
+        if ([51, 53, 55, 61, 63].includes(code)) return "🌦️";
+        if ([65, 66, 67, 80, 81, 82].includes(code)) return "🌧️";
+        if ([71, 73, 75, 85, 86].includes(code)) return "❄️";
+        if ([95, 96, 99].includes(code)) return "⛈️";
+        return "❓";
+    };    
     const handleMouseEnter = (row: number, col: number) => {
         if (isMouseDown) {
             onCellClick(row, col);
@@ -117,7 +172,6 @@ const TableGrid: React.FC<TableGridProps> = ({
   return newCal.id;
 };
 
-
 const addEventToAppCalendar = async () => {
   const accessToken = localStorage.getItem("calendarToken");
   if (!accessToken) {
@@ -154,21 +208,43 @@ const event = {
   else alert("Napaka pri dodajanju dogodka.");
 };
 
-    return (
-        <div
-            className="select-none"
-            onMouseLeave={() => setIsMouseDown(false)}
-        >
-        <button
-                onClick={addEventToAppCalendar}
-                className="bg-green-500 text-white px-4 py-2 rounded mb-4"
-            >
-                Dodaj dogodek v Google Koledar
-        </button>
-            {renderGrid()}
-            
+return (
+  <div
+    className="select-none flex w-full"
+    onMouseLeave={() => setIsMouseDown(false)}
+  >
+    {/* Levi del: tabela */}
+    <div className="w-[85%]">
+      {renderGrid()}
+    </div>
+
+    {/* Desni del: vreme in opozorilo */}
+    <div className="w-[15%] space-y-4">
+      {weather && (
+        <div className="p-4 bg-gray-100 rounded shadow flex items-center gap-4">
+          <div className="text-4xl">{getWeatherIcon(weather.weatherCode)}</div>
+          <div className="text-sm text-gray-800">
+            <div><strong>Temperature:</strong> {weather.temperature}°C</div>
+            <div><strong>Precipitation:</strong> {weather.precipitation} mm</div>
+          </div>
         </div>
-    );
+      )}
+
+      {rainExpected !== null && (
+        <div
+          className={`p-4 rounded flex items-center gap-4 shadow ${
+            rainExpected ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
+        >
+          {rainExpected
+            ? "🌧 Rain is expected – watering is not necessary."
+            : "☀️ No rain expected – you might need to water the plants."}
+        </div>
+      )}
+    </div>
+  </div>
+);
+
 };
 
 export default TableGrid;

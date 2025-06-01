@@ -1,8 +1,24 @@
-import React from "react";
+import { doc, updateDoc } from "firebase/firestore";
+import React, { useState } from "react";
+import { db } from "../../firebase";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+
+// Popravi privzete ikone za Leaflet
+import "leaflet/dist/leaflet.css";
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
+});
 
 type Direction = 'top' | 'bottom' | 'left' | 'right';
 
 interface SetGridPopupProps {
+    spaceId: string;
+    latitude?: number;
+    longitude?: number;
     inputRows: number;
     inputCols: number;
     rows: number;
@@ -15,7 +31,19 @@ interface SetGridPopupProps {
     onClose: () => void;
 }
 
+const LocationSelector = ({ setLatLng }: { setLatLng: (lat: number, lng: number) => void }) => {
+  useMapEvents({
+    click(e) {
+      setLatLng(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+};
+
 const SetGridPopup: React.FC<SetGridPopupProps> = ({
+                                                       spaceId,
+                                                       latitude: initialLat,
+                                                       longitude: initialLon,
                                                        rows,
                                                        cols,
                                                        resizeDirection,
@@ -25,6 +53,10 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
                                                        onApply,
                                                        onClose,
                                                    }) => {
+    const [latitude, setLatitude] = useState<number | "">(initialLat ?? "");
+    const [longitude, setLongitude] = useState<number | "">(initialLon ?? "");
+    const [saving, setSaving] = useState(false);
+
     const handleChange = (val: number) => {
         if (resizeDirection === 'top' || resizeDirection === 'bottom') {
             setInputRows(rows + val);
@@ -32,6 +64,28 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
             setInputCols(cols + val);
         }
     };
+
+    const handleSaveCoordinates = async () => {
+    if (latitude === "" || longitude === "") {
+      alert("⚠️ Vnesi obe koordinati.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const ref = doc(db, "spaces", spaceId);
+      await updateDoc(ref, {
+        latitude: Number(latitude),
+        longitude: Number(longitude),
+      });
+      alert("📍 Lokacija uspešno shranjena.");
+    } catch (err) {
+      console.error("❌ Napaka pri shranjevanju:", err);
+      alert("Napaka pri shranjevanju.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -84,6 +138,33 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
                             Apply
                         </button>
                     </div>
+                         {/* Lokacija prostora */}
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Select Location on Map</h3>
+          <div className="h-64">
+            <MapContainer
+              center={[Number(latitude) || 46.55914802636066, Number(longitude) || 15.638042755523117]}
+              zoom={15}
+              className="h-full rounded z-10"
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <LocationSelector setLatLng={(lat, lng) => {
+                setLatitude(lat);
+                setLongitude(lng);
+              }} />
+              {latitude && longitude && <Marker position={[Number(latitude), Number(longitude)]} />}
+            </MapContainer>
+          </div>
+          <button
+            onClick={handleSaveCoordinates}
+            disabled={saving}
+            className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+          >
+            {saving ? "Shranjujem..." : "Shrani lokacijo"}
+          </button>
+        </div>
                 </div>
             </div>
         </div>

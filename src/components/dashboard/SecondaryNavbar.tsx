@@ -5,13 +5,14 @@ import TableGrid from "./TableGrid";
 import PlanterModal from "../../pages/dashboard/PlanterModal.tsx";
 import PlantEventModal from "../dashboard/PlantEventModal.tsx"
 import GridModal from "../../pages/dashboard/GridModal.tsx";
-import { collection, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
-import { generateWateringEventsForSpace } from "../../scripts/wateringService";
+import { generateWateringEventsForSpace, shouldWaterOutsidePlants } from "../../scripts/wateringService";
 import { getPlantRecommendations } from "../../scripts/recommendationService.ts";
+import { getAuth } from "firebase/auth";
 
 interface SecondaryNavbarProps {
-    spaceId?: string;  // <-- dodamo optional prop
+    spaceId?: string;
     initialRows?: number;
     initialCols?: number;
     initialAssignments?: { [key: string]: string };
@@ -56,6 +57,19 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
     const [eventModalOpen, setEventModalOpen] = useState(false);
     const [recommendations, setRecommendations] = useState<string[]>([]);
     const [recModalOpen, setRecModalOpen] = useState(false);
+    const [spaceData, setSpaceData] = useState<{ latitude?: number; longitude?: number }>({});
+
+    useEffect(() => {
+        const fetchSpaceData = async () => {
+            if (!spaceId) return;
+            const ref = doc(db, "spaces", spaceId);
+            const snap = await getDoc(ref);
+            if (snap.exists()) {
+                setSpaceData(snap.data());
+            }
+        };
+        fetchSpaceData();
+    }, [spaceId]);
 
     const handleRecommendations = async () => {
         const recs = await getPlantRecommendations(spaceId!);
@@ -282,11 +296,43 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                             generateWateringEventsForSpace(spaceId);
                             }}
                             className="bg-indigo-600 hover:bg-indigo-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
-                            >💧 Ustvari zalivalne dogodke
+                            >💧Create watering events
                         </button>
                         <button onClick={handleRecommendations} className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded">
-                        💡 Prikaži priporočila
+                        💡Recommendations
                         </button>
+                       {/* <button
+  onClick={async () => {
+    if (!spaceId) return alert("Manjka spaceId.");
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert("Uporabnik ni prijavljen.");
+      return;
+    }
+
+    try {
+      console.log("➡️ Preverjam vreme za uporabnika:", user.uid);
+      const shouldWater = await shouldWaterOutsidePlants(user.uid);
+
+      if (shouldWater) {
+        console.log("💧 Zalivanje smiselno, ustvarjam dogodke...");
+        await generateWateringEventsForSpace(spaceId);
+      } else {
+        alert("🌧 Zalivanje preskočeno – pričakovano deževje.");
+      }
+    } catch (err) {
+      console.error("Napaka pri preverjanju vremena:", err);
+      alert("Napaka pri preverjanju vremena.");
+    }
+  }}
+  className="bg-indigo-600 hover:bg-indigo-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
+>
+  💧 Ustvari zalivalne dogodke
+</button>*/}
+
 
 
 
@@ -308,6 +354,7 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
 
             {showPopup && (
                 <GridModal
+                    spaceId={spaceId} // ✅ dodano
                     inputRows={inputRows}
                     inputCols={inputCols}
                     rows={rows}
@@ -333,6 +380,7 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
 
             <div className="p-6 flex justify-center">
                 <TableGrid
+                    spaceId={spaceId!} // ← KLJUČNA vrstica!
                     rows={rows}
                     cols={cols}
                     plantAssignments={plantAssignments}
