@@ -12,6 +12,7 @@ import {
 import { db } from "../../firebase";
 import { Trash2 } from "lucide-react";
 import { Button } from "flowbite-react";
+import TutorialModal from "../../components/dashboard/TutorialModal";
 
 interface Space {
     id: string;
@@ -162,6 +163,7 @@ const SpacesPage: React.FC = () => {
                     ))}
                 </div>
             )}
+            <TutorialModal/>
         </div>
     );
 };
