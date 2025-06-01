@@ -23,6 +23,7 @@ interface SecondaryNavbarProps {
         plantAssignments: { [key: string]: string };
         cellLocations: { [key: string]: "inside" | "outside" };
     }) => void;
+    onPlantCareInfo: (info: string) => void;
 }
 
 //const plantOptions = ["Rosemary", "Thyme", "Basil"];
@@ -33,7 +34,8 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                                                              initialCols = 4,
                                                              initialAssignments = {},
                                                              initialLocations = {},
-                                                             onSave
+                                                             onSave,
+                                                             onPlantCareInfo
                                                          }) => {
     const [rows, setRows] = useState(initialRows);
     const [cols, setCols] = useState(initialCols);
@@ -112,6 +114,11 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
         setIsPlantingMode(false);
         setCurrentPlant(null);
     };
+
+    const handlePlantCareInfo = (info: string) => {
+        onPlantCareInfo(info); // Ta state naj obstaja v AreasPage, ne v SecondaryNavbar
+    };
+
 
     // Naloži rastline iz Firestore
     useEffect(() => {
@@ -342,14 +349,16 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
             </nav>
 
             {plantPickerOpen && (
-                <PlanterModal
+               <PlanterModal
                     plantOptions={plantOptions}
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
                     setCurrentPlant={setCurrentPlant}
                     setIsPlantingMode={setIsPlantingMode}
                     onClose={() => setPlantPickerOpen(false)}
+                    onPlantCareInfo={handlePlantCareInfo} // ✅ Dodano!
                 />
+
             )}
 
             {showPopup && (
@@ -410,3 +419,5 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
 };
 
 export default SecondaryNavbar;
+
+
