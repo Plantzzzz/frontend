@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
- 
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,6 +12,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.2.4",
     "@sonar/scan": "^4.3.0",
     "@tailwindcss/vite": "^4.1.6",

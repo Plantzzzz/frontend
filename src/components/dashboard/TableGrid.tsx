@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from "react";
-import {fetchWeatherData, getSpaceLocation} from "../../scripts/wateringService";
+import React, { useEffect, useState } from "react";
+import { fetchWeatherData, getSpaceLocation } from "../../scripts/wateringService";
 
 interface TableGridProps {
-    spaceId: string; // ✅ DODAJ TO
+    spaceId: string;
     rows: number;
     cols: number;
     plantAssignments: { [key: string]: string };
@@ -15,6 +15,14 @@ interface TableGridProps {
     erasePlant: boolean;
 }
 
+// Hard-coded icons for specific plants
+const plantIcons: { [key: string]: string } = {
+    "golden pothos": "🌿",
+    "Aloe Vera": "🪴",
+    "spider plant": "🕸️",
+    // Add more mappings here if needed
+};
+
 const TableGrid: React.FC<TableGridProps> = ({
                                                  spaceId,
                                                  rows,
@@ -24,30 +32,18 @@ const TableGrid: React.FC<TableGridProps> = ({
                                                  onCellClick,
                                              }) => {
     const [isMouseDown, setIsMouseDown] = useState(false);
-
-    const handleMouseDown = (row: number, col: number) => {
-        setIsMouseDown(true);
-        onCellClick(row, col);
-    };
-
     const [weather, setWeather] = useState<null | {
         temperature: number;
         precipitation: number;
         weatherCode: number;
     }>(null);
-
     const [rainExpected, setRainExpected] = useState<boolean | null>(null);
 
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                console.log("📡 Pridobivam vreme za spaceId:", spaceId);
-
-                const {latitude, longitude} = await getSpaceLocation(spaceId);
-                console.log("📍 Lokacija prostora:", latitude, longitude);
-
+                const { latitude, longitude } = await getSpaceLocation(spaceId);
                 const data = await fetchWeatherData(latitude, longitude);
-                console.log("🌦️ Podatki o vremenu:", data);
 
                 setWeather({
                     temperature: data.current.temperature_2m,
@@ -59,15 +55,13 @@ const TableGrid: React.FC<TableGridProps> = ({
                 const significantRain = next6Hours.some((val: number) => val >= 0.5);
                 setRainExpected(significantRain);
             } catch (error: any) {
-                console.error("❌ Napaka pri pridobivanju vremena:", error);
-                alert("❌ Napaka: " + error.message);
+                console.error("❌ Error fetching weather:", error);
+                alert("❌ Error: " + error.message);
             }
         };
 
         if (spaceId) {
             fetchWeather();
-        } else {
-            console.warn("⚠️ Manjka spaceId!");
         }
     }, [spaceId]);
 
@@ -82,6 +76,12 @@ const TableGrid: React.FC<TableGridProps> = ({
         if ([95, 96, 99].includes(code)) return "⛈️";
         return "❓";
     };
+
+    const handleMouseDown = (row: number, col: number) => {
+        setIsMouseDown(true);
+        onCellClick(row, col);
+    };
+
     const handleMouseEnter = (row: number, col: number) => {
         if (isMouseDown) {
             onCellClick(row, col);
@@ -102,7 +102,8 @@ const TableGrid: React.FC<TableGridProps> = ({
                 const assignedPlant = plantAssignments[key];
                 const location = cellLocations[key];
 
-                let cellClass = "w-20 h-20 border flex items-center justify-center text-sm cursor-pointer ";
+                let cellClass =
+                    "w-20 h-20 border flex items-center justify-center text-sm cursor-pointer ";
                 if (location === "inside") cellClass += "bg-blue-300 ";
                 else if (location === "outside") cellClass += "bg-yellow-300 ";
                 else cellClass += "bg-gray-200 ";
@@ -117,7 +118,10 @@ const TableGrid: React.FC<TableGridProps> = ({
                         title={assignedPlant || location || ""}
                     >
                         {assignedPlant && (
-                            <span className="text-black font-medium text-sm">{assignedPlant}</span>
+                            <span className="text-black font-medium text-sm flex flex-col items-center">
+                                <span>{plantIcons[assignedPlant] || "🌱"}</span>
+                                <span>{assignedPlant}</span>
+                            </span>
                         )}
                     </div>
                 );
@@ -129,83 +133,11 @@ const TableGrid: React.FC<TableGridProps> = ({
             );
         }
 
-        return rowsArray;
-    };
-    const findOrCreateAppCalendar = async (accessToken: string) => {
-        // 1. Pokliči calendarList in takoj preveri status
-        const listRes = await fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
-            headers: {Authorization: `Bearer ${accessToken}`},
-        });
-
-        if (!listRes.ok) {
-            const error = await listRes.json();
-            console.error("Napaka pri branju calendarList:", error);
-            throw new Error("Ni dovoljenja za branje seznama koledarjev.");
-        }
-
-        // 2. Če je vse OK, nadaljuj z branjem podatkov
-        const listData = await listRes.json();
-
-        const existing = listData.items.find((cal: any) => cal.summary === "Moja Aplikacija");
-        if (existing) return existing.id;
-
-        // 3. Če ni, ustvari nov koledar
-        const createRes = await fetch("https://www.googleapis.com/calendar/v3/calendars", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                summary: "Moja Aplikacija",
-                timeZone: "Europe/Ljubljana",
-            }),
-        });
-
-        if (!createRes.ok) {
-            const error = await createRes.json();
-            console.error("Napaka pri ustvarjanju koledarja:", error);
-            throw new Error("Napaka pri ustvarjanju koledarja.");
-        }
-
-        const newCal = await createRes.json();
-        return newCal.id;
-    };
-
-    const addEventToAppCalendar = async () => {
-        const accessToken = localStorage.getItem("calendarToken");
-        if (!accessToken) {
-            alert("Uporabnik ni prijavljen.");
-            return;
-        }
-
-        const calendarId = await findOrCreateAppCalendar(accessToken);
-
-        const event = {
-            summary: "Poreži rožmarin",
-            description: "Poreži rožmarin.",
-            start: {
-                dateTime: new Date('2025-07-04T10:00:00+02:00').toISOString(), // UTC+2 za Ljubljano poleti
-                timeZone: "Europe/Ljubljana",
-            },
-            end: {
-                dateTime: new Date('2025-07-04T13:00:00+02:00').toISOString(), // Traja 1 uro
-                timeZone: "Europe/Ljubljana",
-            },
-        };
-
-
-        const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(event),
-        });
-
-        if (res.ok) alert("Dogodek dodan!");
-        else alert("Napaka pri dodajanju dogodka.");
+        return (
+            <div className="flex flex-col">
+                {rowsArray}
+            </div>
+        );
     };
 
     return (
@@ -213,12 +145,12 @@ const TableGrid: React.FC<TableGridProps> = ({
             className="select-none flex w-full"
             onMouseLeave={() => setIsMouseDown(false)}
         >
-            {/* Levi del: tabela */}
-            <div className="w-[85%]">
+            {/* Left side: Centered table */}
+            <div className="w-[85%] flex justify-center">
                 {renderGrid()}
             </div>
 
-            {/* Desni del: vreme in opozorilo */}
+            {/* Right side: Weather info */}
             <div className="w-[15%] space-y-4">
                 {weather && (
                     <div className="p-4 bg-gray-100 rounded shadow flex items-center gap-4">
@@ -244,7 +176,6 @@ const TableGrid: React.FC<TableGridProps> = ({
             </div>
         </div>
     );
-
 };
 
 export default TableGrid;
