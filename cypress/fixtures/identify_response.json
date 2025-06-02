@@ -1,0 +1,21 @@
+{
+  "plantnet_result": {
+    "results": [
+      {
+        "species": {
+          "scientificNameWithoutAuthor": "Ficus lyrata",
+          "commonNames": ["Fiddle Leaf Fig"],
+          "description": { "value": "Opis rastline." },
+          "distribution": { "native": ["Africa"] }
+        },
+        "score": 0.95
+      }
+    ]
+  },
+  "perenual_detail": {
+    "watering": "Average",
+    "sunlight": ["Full Sun", "Partial Shade"],
+    "cycle": "Perennial",
+    "default_image": { "medium_url": "https://example.com/plant.jpg" }
+  }
+}
