@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { fetchWeatherData, getSpaceLocation } from "../../scripts/wateringService";
+import React, {useEffect, useState} from "react";
+import {fetchWeatherData, getSpaceLocation} from "../../scripts/wateringService";
 
 interface TableGridProps {
     spaceId: string; // ✅ DODAJ TO
@@ -16,7 +16,7 @@ interface TableGridProps {
 }
 
 const TableGrid: React.FC<TableGridProps> = ({
-                                                spaceId,
+                                                 spaceId,
                                                  rows,
                                                  cols,
                                                  plantAssignments,
@@ -29,7 +29,7 @@ const TableGrid: React.FC<TableGridProps> = ({
         setIsMouseDown(true);
         onCellClick(row, col);
     };
-    
+
     const [weather, setWeather] = useState<null | {
         temperature: number;
         precipitation: number;
@@ -43,7 +43,7 @@ const TableGrid: React.FC<TableGridProps> = ({
             try {
                 console.log("📡 Pridobivam vreme za spaceId:", spaceId);
 
-                const { latitude, longitude } = await getSpaceLocation(spaceId);
+                const {latitude, longitude} = await getSpaceLocation(spaceId);
                 console.log("📍 Lokacija prostora:", latitude, longitude);
 
                 const data = await fetchWeatherData(latitude, longitude);
@@ -81,7 +81,7 @@ const TableGrid: React.FC<TableGridProps> = ({
         if ([71, 73, 75, 85, 86].includes(code)) return "❄️";
         if ([95, 96, 99].includes(code)) return "⛈️";
         return "❓";
-    };    
+    };
     const handleMouseEnter = (row: number, col: number) => {
         if (isMouseDown) {
             onCellClick(row, col);
@@ -132,118 +132,118 @@ const TableGrid: React.FC<TableGridProps> = ({
         return rowsArray;
     };
     const findOrCreateAppCalendar = async (accessToken: string) => {
-  // 1. Pokliči calendarList in takoj preveri status
-  const listRes = await fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+        // 1. Pokliči calendarList in takoj preveri status
+        const listRes = await fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
+            headers: {Authorization: `Bearer ${accessToken}`},
+        });
 
-  if (!listRes.ok) {
-    const error = await listRes.json();
-    console.error("Napaka pri branju calendarList:", error);
-    throw new Error("Ni dovoljenja za branje seznama koledarjev.");
-  }
+        if (!listRes.ok) {
+            const error = await listRes.json();
+            console.error("Napaka pri branju calendarList:", error);
+            throw new Error("Ni dovoljenja za branje seznama koledarjev.");
+        }
 
-  // 2. Če je vse OK, nadaljuj z branjem podatkov
-  const listData = await listRes.json();
+        // 2. Če je vse OK, nadaljuj z branjem podatkov
+        const listData = await listRes.json();
 
-  const existing = listData.items.find((cal: any) => cal.summary === "Moja Aplikacija");
-  if (existing) return existing.id;
+        const existing = listData.items.find((cal: any) => cal.summary === "Moja Aplikacija");
+        if (existing) return existing.id;
 
-  // 3. Če ni, ustvari nov koledar
-  const createRes = await fetch("https://www.googleapis.com/calendar/v3/calendars", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      summary: "Moja Aplikacija",
-      timeZone: "Europe/Ljubljana",
-    }),
-  });
+        // 3. Če ni, ustvari nov koledar
+        const createRes = await fetch("https://www.googleapis.com/calendar/v3/calendars", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                summary: "Moja Aplikacija",
+                timeZone: "Europe/Ljubljana",
+            }),
+        });
 
-  if (!createRes.ok) {
-    const error = await createRes.json();
-    console.error("Napaka pri ustvarjanju koledarja:", error);
-    throw new Error("Napaka pri ustvarjanju koledarja.");
-  }
+        if (!createRes.ok) {
+            const error = await createRes.json();
+            console.error("Napaka pri ustvarjanju koledarja:", error);
+            throw new Error("Napaka pri ustvarjanju koledarja.");
+        }
 
-  const newCal = await createRes.json();
-  return newCal.id;
-};
+        const newCal = await createRes.json();
+        return newCal.id;
+    };
 
-const addEventToAppCalendar = async () => {
-  const accessToken = localStorage.getItem("calendarToken");
-  if (!accessToken) {
-    alert("Uporabnik ni prijavljen.");
-    return;
-  }
+    const addEventToAppCalendar = async () => {
+        const accessToken = localStorage.getItem("calendarToken");
+        if (!accessToken) {
+            alert("Uporabnik ni prijavljen.");
+            return;
+        }
 
-  const calendarId = await findOrCreateAppCalendar(accessToken);
+        const calendarId = await findOrCreateAppCalendar(accessToken);
 
-const event = {
-  summary: "Poreži rožmarin",
-  description: "Poreži rožmarin.",
-  start: {
-    dateTime: new Date('2025-07-04T10:00:00+02:00').toISOString(), // UTC+2 za Ljubljano poleti
-    timeZone: "Europe/Ljubljana",
-  },
-  end: {
-    dateTime: new Date('2025-07-04T13:00:00+02:00').toISOString(), // Traja 1 uro
-    timeZone: "Europe/Ljubljana",
-  },
-};
+        const event = {
+            summary: "Poreži rožmarin",
+            description: "Poreži rožmarin.",
+            start: {
+                dateTime: new Date('2025-07-04T10:00:00+02:00').toISOString(), // UTC+2 za Ljubljano poleti
+                timeZone: "Europe/Ljubljana",
+            },
+            end: {
+                dateTime: new Date('2025-07-04T13:00:00+02:00').toISOString(), // Traja 1 uro
+                timeZone: "Europe/Ljubljana",
+            },
+        };
 
 
-  const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(event),
-  });
+        const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(event),
+        });
 
-  if (res.ok) alert("Dogodek dodan!");
-  else alert("Napaka pri dodajanju dogodka.");
-};
+        if (res.ok) alert("Dogodek dodan!");
+        else alert("Napaka pri dodajanju dogodka.");
+    };
 
-return (
-  <div
-    className="select-none flex w-full"
-    onMouseLeave={() => setIsMouseDown(false)}
-  >
-    {/* Levi del: tabela */}
-    <div className="w-[85%]">
-      {renderGrid()}
-    </div>
-
-    {/* Desni del: vreme in opozorilo */}
-    <div className="w-[15%] space-y-4">
-      {weather && (
-        <div className="p-4 bg-gray-100 rounded shadow flex items-center gap-4">
-          <div className="text-4xl">{getWeatherIcon(weather.weatherCode)}</div>
-          <div className="text-sm text-gray-800">
-            <div><strong>Temperature:</strong> {weather.temperature}°C</div>
-            <div><strong>Precipitation:</strong> {weather.precipitation} mm</div>
-          </div>
-        </div>
-      )}
-
-      {rainExpected !== null && (
+    return (
         <div
-          className={`p-4 rounded flex items-center gap-4 shadow ${
-            rainExpected ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+            className="select-none flex w-full"
+            onMouseLeave={() => setIsMouseDown(false)}
         >
-          {rainExpected
-            ? "🌧 Rain is expected – watering is not necessary."
-            : "☀️ No rain expected – you might need to water the plants."}
+            {/* Levi del: tabela */}
+            <div className="w-[85%]">
+                {renderGrid()}
+            </div>
+
+            {/* Desni del: vreme in opozorilo */}
+            <div className="w-[15%] space-y-4">
+                {weather && (
+                    <div className="p-4 bg-gray-100 rounded shadow flex items-center gap-4">
+                        <div className="text-4xl">{getWeatherIcon(weather.weatherCode)}</div>
+                        <div className="text-sm text-gray-800">
+                            <div><strong>Temperature:</strong> {weather.temperature}°C</div>
+                            <div><strong>Precipitation:</strong> {weather.precipitation} mm</div>
+                        </div>
+                    </div>
+                )}
+
+                {rainExpected !== null && (
+                    <div
+                        className={`p-4 rounded flex items-center gap-4 shadow ${
+                            rainExpected ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        }`}
+                    >
+                        {rainExpected
+                            ? "🌧 Rain is expected – watering is not necessary."
+                            : "☀️ No rain expected – you might need to water the plants."}
+                    </div>
+                )}
+            </div>
         </div>
-      )}
-    </div>
-  </div>
-);
+    );
 
 };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import ProfileImageUploader from "./ProfileImageUploader"; // Adjust path if needed
+import ProfileImageUploader from "./ProfileImageUploader";
 
 const UserInfoCard: React.FC = () => {
     const user = JSON.parse(sessionStorage.getItem("user") || "{}");
@@ -9,7 +9,7 @@ const UserInfoCard: React.FC = () => {
             <div className="flex items-center gap-5 mb-6">
                 {user.profileImage ? (
                     <img
-                        src={user.profileImage}
+                        src={user.profileImage || user.photoURL || ""}
                         alt="User profile"
                         className="w-20 h-20 rounded-full object-cover ring-2 ring-offset-2 ring-gray-300 dark:ring-gray-700"
                     />
@@ -20,7 +20,7 @@ const UserInfoCard: React.FC = () => {
                 )}
                 <div className="flex flex-col">
                     <h2 className="text-xl font-bold tracking-tight">
-                        {user.username || "Unnamed User"}
+                        {user.displayName || "Unnamed User"}
                     </h2>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                         {user.email || "No email provided"}
