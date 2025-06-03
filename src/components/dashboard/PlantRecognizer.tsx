@@ -30,7 +30,7 @@ const PlantRecognizer = () => {
     formData.append('image', image);
 
     try {
-      const res = await fetch('http://localhost:5000/identify', {
+      const res = await fetch('https://petalbot.onrender.com/identify', {
         method: 'POST',
         body: formData,
       });
@@ -50,42 +50,6 @@ const PlantRecognizer = () => {
     }
   };
 
-const savePlantToFirestore = async () => {
-  if (!result || !result.plantnet_result?.results?.length || !auth.currentUser || !image) return;
-
-  try {
-    // 1. Najprej naloži sliko v Firebase Storage
-    const storageRef = ref(storage, `plant_images/${auth.currentUser.uid}/${Date.now()}_${image.name}`);
-    await uploadBytes(storageRef, image);
-    const imageUrl = await getDownloadURL(storageRef); // pridobi URL naložene slike
-
-    // 2. Nato shrani vse skupaj v Firestore
-    const plantData = {
-      userId: auth.currentUser.uid,
-      scientificName: result.plantnet_result.results[0].species?.scientificNameWithoutAuthor || '',
-      commonNames: result.plantnet_result.results[0].species?.commonNames || [],
-      score: result.plantnet_result.results[0].score || 0,
-      description: result.plantnet_result.results[0].species?.description?.value || '',
-      origin: result.plantnet_result.results[0].species?.distribution?.native || [],
-      watering: result.perenual_detail?.watering || '',
-      sunlight: result.perenual_detail?.sunlight || [],
-      cycle: result.perenual_detail?.cycle || '',
-      imageUploaded: imageUrl, // uporabi pravi URL
-      createdAt: new Date().toISOString(),
-    };
-
-    await addDoc(collection(db, 'saved_plants'), plantData);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  } catch (error) {
-    console.error('Napaka pri shranjevanju:', error);
-    console.log("UID:", auth.currentUser?.uid);
-console.log("Storage path:", `plant_images/${auth.currentUser?.uid}/${Date.now()}_${image.name}`);
-
-  }
-};
-
-
   return (
     <div>
       <h1 className="text-4xl font-bold mb-12 text-center animate-fade-in-up">
@@ -93,10 +57,10 @@ console.log("Storage path:", `plant_images/${auth.currentUser?.uid}/${Date.now()
       </h1>
       <div className=" bg-gray text-gray-200 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-xl bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
-          <h2 className="text-3xl font-semibold mb-6 text-center text-green-400">🌿 Prepoznaj rastlino</h2>
+          <h2 className="text-3xl font-semibold mb-6 text-center text-green-400">🌿 Recognize your plant</h2>
 
           <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="imageUpload">
-            Naloži sliko:
+            Upload the image:
           </label>
           <input
             id="imageUpload"
@@ -114,30 +78,30 @@ console.log("Storage path:", `plant_images/${auth.currentUser?.uid}/${Date.now()
             type="button"
             className="w-full bg-green-600 text-gray-100 font-semibold py-2 rounded-md hover:bg-green-500 transition-colors mb-4"
           >
-            {loading ? 'Prepoznavanje...' : 'Prepoznaj'}
+            {loading ? 'Recognizing...' : 'Recognize'}
           </button>
 
           {error && (
             <div className="bg-red-700 text-red-300 p-3 rounded mb-4 border border-red-600">
-              {error}
+              Sorry, we couldnt recognize your plant
             </div>
           )}
 
           {result && result.plantnet_result?.results?.length > 0 && (
             <div className="mt-6 p-4 border border-green-700 rounded-md bg-gray-800">
               <h3 className="text-xl font-semibold text-green-400 mb-2">
-                🌿 Najverjetnejša rastlina
+                🌿 Your plant is most likely
               </h3>
               <p className="text-lg font-bold text-green-300">
                 {result.plantnet_result.results[0].species?.scientificNameWithoutAuthor}
               </p>
               <p className="text-green-500 italic mb-1">
-                Verjetnost: {(result.plantnet_result.results[0].score * 100).toFixed(2)}%
+                Probability: {(result.plantnet_result.results[0].score * 100).toFixed(2)}%
               </p>
 
               {result.plantnet_result.results[0].species?.commonNames?.length > 0 && (
                 <p className="text-sm text-gray-400 mb-1">
-                  🌱 Skupna imena: {result.plantnet_result.results[0].species.commonNames.join(', ')}
+                  🌱 Other names: {result.plantnet_result.results[0].species.commonNames.join(', ')}
                 </p>
               )}
 
@@ -155,7 +119,7 @@ console.log("Storage path:", `plant_images/${auth.currentUser?.uid}/${Date.now()
 
               {image && (
                 <div className="mt-4">
-                  <h4 className="text-md font-semibold mb-1 text-green-400">🖼️ Slika rastline:</h4>
+                  <h4 className="text-md font-semibold mb-1 text-green-400">🖼️ Plant image:</h4>
                   <img
                     src={URL.createObjectURL(image)}
                     alt="Vaša naložena rastlina"
@@ -191,15 +155,6 @@ console.log("Storage path:", `plant_images/${auth.currentUser?.uid}/${Date.now()
               {result.perenual_error && (
                 <p className="text-red-600 mt-2">⚠️ {result.perenual_error}</p>
               )}
-
-              <button
-                onClick={savePlantToFirestore}
-                disabled={saved}
-                className={`mt-4 w-full font-semibold py-2 rounded-md transition-all duration-500
-                  ${saved ? 'bg-green-500 text-gray-100' : 'bg-green-700 text-gray-100 hover:bg-green-600'}`}
-              >
-                {saved ? '✅ Uspešno shranjeno!' : '💾 Shrani med moje rastline'}
-              </button>
             </div>
           )}
         </div>
