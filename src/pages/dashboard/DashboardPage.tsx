@@ -117,7 +117,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 px-6 py-10">
+    <div className="min-h-screen bg-gradient-to-br text-gray-100 px-6 py-10">
       <h1 className="text-4xl font-bold mb-12 text-center animate-fade-in-up">
           🌱 Dashboard
       </h1>
