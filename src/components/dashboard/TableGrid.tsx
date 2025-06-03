@@ -92,48 +92,63 @@ const TableGrid: React.FC<TableGridProps> = ({
         setIsMouseDown(false);
     };
 
-    const renderGrid = () => {
-        const rowsArray = [];
 
-        for (let r = 1; r <= rows; r++) {
-            const colsArray = [];
-            for (let c = 1; c <= cols; c++) {
-                const key = `${r}-${c}`;
-                const assignedPlant = plantAssignments[key];
-                const location = cellLocations[key];
 
-                let cellClass = "w-20 h-20 border flex items-center justify-center text-sm cursor-pointer ";
-                if (location === "inside") cellClass += "bg-blue-300 ";
-                else if (location === "outside") cellClass += "bg-yellow-300 ";
-                else cellClass += "bg-gray-200 ";
+const renderGrid = () => {
+    const rowsArray = [];
 
-                colsArray.push(
-                    <div
-                        key={key}
-                        className={cellClass}
-                        onMouseDown={() => handleMouseDown(r, c)}
-                        onMouseEnter={() => handleMouseEnter(r, c)}
-                        onMouseUp={handleMouseUp}
-                        title={assignedPlant || location || ""}
-                    >
-                        {assignedPlant && (
-                            <span className="text-black font-medium text-sm">{assignedPlant}</span>
-                        )}
-                    </div>
-                );
-            }
-            rowsArray.push(
-                <div key={r} className="flex">
-                    {colsArray}
+    for (let r = 1; r <= rows; r++) {
+        const colsArray = [];
+        for (let c = 1; c <= cols; c++) {
+            const key = `${r}-${c}`;
+            const assignedPlant = plantAssignments[key];
+            const location = cellLocations[key];
+
+            let cellClass =
+                "w-24 h-24 border border-gray-700 cursor-pointer flex items-center justify-center rounded-md transition duration-150 ease-in-out ";
+
+            if (location === "inside") cellClass += "bg-blue-700 hover:bg-blue-600";
+            else if (location === "outside") cellClass += "bg-yellow-400 hover:bg-yellow-300";
+            else cellClass += "bg-gray-600 hover:bg-gray-500";
+
+            colsArray.push(
+                <div
+                    key={key}
+                    className={cellClass}
+                    onMouseDown={() => handleMouseDown(r, c)}
+                    onMouseEnter={() => handleMouseEnter(r, c)}
+                    onMouseUp={handleMouseUp}
+                    title={assignedPlant || location || ""}
+                >
+                    {assignedPlant && (
+                        <span className="text-white font-semibold text-base text-center">
+                            {assignedPlant}
+                        </span>
+                    )}
                 </div>
             );
         }
 
-        return rowsArray;
-    };
-    const findOrCreateAppCalendar = async (accessToken: string) => {
-  // 1. Pokliči calendarList in takoj preveri status
-  const listRes = await fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
+        rowsArray.push(
+            <div key={r} className="flex gap-1 mb-1">
+                {colsArray}
+            </div>
+        );
+    }
+
+    return (
+        <div className="p-6 rounded-lg shadow-md border border-gray-700 bg-gray-800 w-fit">
+            {rowsArray}
+        </div>
+    );
+};
+
+
+
+
+  const findOrCreateAppCalendar = async (accessToken: string) => {
+    // 1. Pokliči calendarList in takoj preveri status
+    const listRes = await fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
@@ -208,42 +223,46 @@ const event = {
   else alert("Napaka pri dodajanju dogodka.");
 };
 
+
 return (
   <div
-    className="select-none flex w-full"
+    className="select-none flex justify-center items-start w-full min-h-screen bg-gray-900 py-8"
     onMouseLeave={() => setIsMouseDown(false)}
   >
-    {/* Levi del: tabela */}
-    <div className="w-[85%]">
-      {renderGrid()}
-    </div>
+    <div className="flex w-full max-w-[90%] gap-8">
+      {/* Levi del: tabela */}
+      <div className="flex-1 flex justify-center">{renderGrid()}</div>
 
-    {/* Desni del: vreme in opozorilo */}
-    <div className="w-[15%] space-y-4">
-      {weather && (
-        <div className="p-4 bg-gray-100 rounded shadow flex items-center gap-4">
-          <div className="text-4xl">{getWeatherIcon(weather.weatherCode)}</div>
-          <div className="text-sm text-gray-800">
-            <div><strong>Temperature:</strong> {weather.temperature}°C</div>
-            <div><strong>Precipitation:</strong> {weather.precipitation} mm</div>
+      {/* Desni del: vreme in opozorilo */}
+      <div className="w-[250px] space-y-4">
+        {weather && (
+          <div className="p-4 bg-gray-800 text-white rounded shadow flex items-center gap-4">
+            <div className="text-4xl">{getWeatherIcon(weather.weatherCode)}</div>
+            <div className="text-sm">
+              <div><strong>Temperature:</strong> {weather.temperature}°C</div>
+              <div><strong>Precipitation:</strong> {weather.precipitation} mm</div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {rainExpected !== null && (
-        <div
-          className={`p-4 rounded flex items-center gap-4 shadow ${
-            rainExpected ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
-        >
-          {rainExpected
-            ? "🌧 Rain is expected – watering is not necessary."
-            : "☀️ No rain expected – you might need to water the plants."}
-        </div>
-      )}
+        {rainExpected !== null && (
+          <div
+            className={`p-4 rounded flex items-center gap-4 shadow ${
+              rainExpected
+                ? "bg-green-900 text-green-200"
+                : "bg-red-900 text-red-200"
+            }`}
+          >
+            {rainExpected
+              ? "🌧 Rain is expected – watering is not necessary."
+              : "☀️ No rain expected – you might need to water the plants."}
+          </div>
+        )}
+      </div>
     </div>
   </div>
 );
+
 
 };
 

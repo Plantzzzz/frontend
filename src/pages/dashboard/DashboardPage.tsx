@@ -27,14 +27,16 @@ export default function Dashboard() {
 
     
     const tips = [
-    "Ne zalivaj svojih rastlin vsak dan – večina sobnih rastlin raje presuši kot prekomerno zamoči.",
-    "Rastline postavi na mesto z dovolj svetlobe, a ne direktne močne sončne svetlobe.",
-    "Uporabi gnojilo vsaj enkrat na mesec za boljšo rast rastlin.",
-    "Redno odstranjuj suhe ali poškodovane liste, da preprečiš širjenje bolezni.",
-    "Preveri, ali ima rastlina dovolj drenaže – stojna voda lahko povzroči gnitje korenin.",
-    "Zrači prostor, kjer so rastline, za preprečevanje plesni in škodljivcev.",
-    "Uporabi deževnico ali odstajano vodo za zalivanje, da rastline bolje uspevajo."
-  ];
+      "Don't water your plants every day – most houseplants prefer to dry out a bit rather than be overwatered.",
+      "Place your plants in a spot with plenty of light, but avoid direct, intense sunlight.",
+      "Use fertilizer at least once a month to promote healthy plant growth.",
+      "Regularly remove dead or damaged leaves to prevent the spread of disease.",
+      "Ensure your plant pots have proper drainage – standing water can cause root rot.",
+      "Ventilate the room where your plants are to prevent mold and pests.",
+      "Use rainwater or water that has been left to sit overnight for better results.",
+      "Rotate your plants occasionally so all sides receive equal light and grow evenly.",
+    ];
+
    const [dailyTip, setDailyTip] = useState("");
 
   useEffect(() => {
@@ -115,9 +117,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 px-6 py-10">
-      <h1 className="text-4xl font-bold mb-12 text-green-400 text-center animate-fade-in-up">
-        🌱 Tvoj rastlinski kotiček
+    <div className="min-h-screen bg-gradient-to-br text-gray-100 px-6 py-10">
+      <h1 className="text-4xl font-bold mb-12 text-center animate-fade-in-up">
+          🌱 Dashboard
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-7xl mx-auto">
@@ -130,8 +132,8 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <LineChart className="text-green-400 w-12 h-12 animate-pulse" />
               <div>
-                <h2 className="text-xl font-semibold">Statistika</h2>
-                <p className="text-sm text-gray-400">Poglej podatke o tvoji rastlinski rasti</p>
+                <h2 className="text-xl font-semibold">Statistics</h2>
+                <p className="text-sm text-gray-400">Check the information about your plants</p>
               </div>
             </div>
           </div>
@@ -143,21 +145,21 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <Flower2 className="text-green-400 w-12 h-12 animate-spin-slow" />
               <div>
-                <h2 className="text-xl font-semibold">Rastline</h2>
-                <p className="text-sm text-gray-400">Upravljaj svoje rastline</p>
+                <h2 className="text-xl font-semibold">Plants</h2>
+                <p className="text-sm text-gray-400">Manage your plants</p>
               </div>
             </div>
           </div>
 
           <div
-            onClick={() => navigate("/dashboard/recognition")}
+            onClick={() => navigate("/dashboard/plantRecognition")}
             className="bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-md hover:shadow-green-500/20 transition-all duration-300 hover:scale-[1.01] cursor-pointer"
           >
             <div className="flex items-center space-x-4">
               <Wand2 className="text-green-400 w-12 h-12 animate-wiggle" />
               <div>
-                <h2 className="text-xl font-semibold">Prepoznava</h2>
-                <p className="text-sm text-gray-400">Prepoznaj novo rastlino iz slike</p>
+                <h2 className="text-xl font-semibold">Plant recognitions</h2>
+                <p className="text-sm text-gray-400">Recognize plants from an image</p>
               </div>
             </div>
           </div>
@@ -169,8 +171,8 @@ export default function Dashboard() {
             <div className="flex items-center space-x-4">
               <Globe2 className="text-green-400 w-12 h-12" />
               <div>
-                <h2 className="text-xl font-semibold">Prostori</h2>
-                <p className="text-sm text-gray-400">Upravljaj prostore in okolja rastlin</p>
+                <h2 className="text-xl font-semibold">Spaces</h2>
+                <p className="text-sm text-gray-400">Manage the spaces and environment of plants</p>
               </div>
             </div>
           </div>
@@ -179,9 +181,9 @@ export default function Dashboard() {
         {/* Right Column */}
         <div className="md:col-span-5 space-y-6">
           <div className="bg-green-900 border border-green-700 p-6 rounded-2xl shadow-lg transition-all duration-300">
-            <h2 className="text-xl font-semibold mb-2 text-green-100">🌦️ Trenutno vreme</h2>
+            <h2 className="text-xl font-semibold mb-2 text-green-100">🌦️ Weather</h2>
             {weather.loading ? (
-              <p className="text-gray-300 text-sm">Nalaganje vremena...</p>
+              <p className="text-gray-300 text-sm">Loading weather...</p>
             ) : weather.error ? (
               <p className="text-red-400 text-sm">Napaka: {weather.error}</p>
             ) : (
@@ -199,7 +201,7 @@ export default function Dashboard() {
                   </p>
                   <p className="capitalize text-gray-400 text-sm">{weather.description}</p>
                   <p className="text-xs text-gray-500">
-                    Zadnja posodobitev: {dayjs().format("H:mm")}
+                    Last update: {dayjs().format("H:mm")}
                   </p>
                 </div>
               </div>
@@ -207,7 +209,7 @@ export default function Dashboard() {
           </div>
 
           <div className="bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-md">
-            <h2 className="text-xl font-semibold text-green-300 mb-2">🌱 Dnevni nasvet</h2>
+            <h2 className="text-xl font-semibold text-green-300 mb-2">🌱 Daily tip</h2>
             <p className="text-gray-400 italic">
               {dailyTip}
             </p>

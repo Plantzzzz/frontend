@@ -293,21 +293,32 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                         >
                             <Save className="w-4 h-4" /> Save Table
                         </button>
-                        <button
+
+                       {!editMode && (
+                        <>
+                            <button
                             onClick={() => {
                                 if (!spaceId) {
                                 alert("Manjka spaceId.");
                                 return;
                                 }
                                 console.log("➡️ Kličem generateWateringEventsForSpace za:", spaceId);
-                            generateWateringEventsForSpace(spaceId);
+                                generateWateringEventsForSpace(spaceId);
                             }}
                             className="bg-indigo-600 hover:bg-indigo-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
-                            >💧Create watering events
-                        </button>
-                        <button onClick={handleRecommendations} className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded">
-                        💡Recommendations
-                        </button>
+                            >
+                            💧Create watering events
+                            </button>
+
+                            <button
+                            onClick={handleRecommendations}
+                            className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded"
+                            >
+                            💡Recommendations
+                            </button>
+                        </>
+                        )}
+
                        {/* <button
   onClick={async () => {
     if (!spaceId) return alert("Manjka spaceId.");

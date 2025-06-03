@@ -72,10 +72,15 @@ const PlantList: React.FC = () => {
                     onClick={() => setSelected(group)}
                 >
                     <img
-                        src={group.image || "https://source.unsplash.com/300x200/?plant"}
+                        src={group.image || "/plant.jpg"}
                         alt={group.plant}
                         className="w-full h-40 object-cover"
-                    />
+                        onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/plant.jpg";
+                        }}
+                        />
+
                     <div className="p-4">
                         <h3 className="text-lg font-semibold text-white">{group.plant}</h3>
                         <p className="text-sm text-gray-400">Location: {group.location}</p>
