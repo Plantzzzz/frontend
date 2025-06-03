@@ -51,18 +51,16 @@ const SimplePlantSelector: React.FC<Props> = ({ onSelect, selectedKey }) => {
 
     return (
         <div>
-            <label className="block text-white font-semibold mb-2">Select a plant:</label>
+            <label className="block text-white text-lg font-semibold mb-3">Select a plant:</label>
             <select
-                className="w-full bg-gray-800 text-white border border-gray-600 px-4 py-2 rounded"
+                className="w-full bg-gray-800 text-white border border-gray-600 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 onChange={(e) => {
                     const selected = groups.find((g) => g.key === e.target.value);
                     if (selected) onSelect(selected);
                 }}
                 value={selectedKey || ""}
             >
-                <option value="" disabled>
-                    -- Choose a plant --
-                </option>
+                <option value="" disabled>-- Choose a plant --</option>
                 {groups.map((group) => (
                     <option key={group.key} value={group.key}>
                         {group.plant} ({group.location})
@@ -70,6 +68,7 @@ const SimplePlantSelector: React.FC<Props> = ({ onSelect, selectedKey }) => {
                 ))}
             </select>
         </div>
+
     );
 };
 

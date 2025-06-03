@@ -8,6 +8,7 @@ import {
     updateDoc,
     doc,
 } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface GroupedPlant {
     key: string;
@@ -66,40 +67,53 @@ const PlantTodoList: React.FC<Props> = ({ group }) => {
 
     return (
         <div>
-            <h3 className="text-md font-semibold mb-2">{group.plant} Tasks</h3>
-            <div className="flex gap-2 mb-3">
+            <h3 className="text-xl text-white font-semibold mb-4">
+                ✅ {group.plant} Tasks
+            </h3>
+            <div className="flex gap-2 mb-4">
                 <input
                     value={newTask}
                     onChange={(e) => setNewTask(e.target.value)}
-                    className="flex-grow border px-3 py-2 rounded"
+                    className="flex-grow bg-gray-800 border border-gray-600 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition"
                     placeholder="New task..."
                 />
-                <button onClick={addTask} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                    Add
+                <button
+                    onClick={addTask}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                >
+                    ➕ Add
                 </button>
             </div>
-            <ul className="space-y-2">
-                {tasks.map((task) => (
-                    <li
-                        key={task.id}
-                        className={`flex justify-between items-center px-4 py-2 border rounded ${
-                            task.done ? "bg-green-100" : ""
-                        }`}
-                    >
-                        <span
-                            className={`cursor-pointer flex-1 ${task.done ? "line-through text-gray-500" : ""}`}
-                            onClick={() => toggleDone(task)}
+            <ul className="space-y-3">
+                <AnimatePresence>
+                    {tasks.map((task) => (
+                        <motion.li
+                            key={task.id}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, x: 50 }}
+                            transition={{ duration: 0.2 }}
+                            className={`flex justify-between items-center px-4 py-3 border border-gray-600 rounded-lg ${
+                                task.done ? "bg-green-200/10" : "bg-gray-800"
+                            }`}
                         >
-                            {task.text}
-                        </span>
-                        <button
-                            onClick={() => deleteTask(task)}
-                            className="text-red-500 hover:text-red-700 ml-4"
-                        >
-                            Delete
-                        </button>
-                    </li>
-                ))}
+                            <span
+                                className={`cursor-pointer flex-1 text-white ${
+                                    task.done ? "line-through text-gray-400" : ""
+                                }`}
+                                onClick={() => toggleDone(task)}
+                            >
+                                {task.text}
+                            </span>
+                            <button
+                                onClick={() => deleteTask(task)}
+                                className="text-red-400 hover:text-red-600 transition ml-4"
+                            >
+                                🗑️
+                            </button>
+                        </motion.li>
+                    ))}
+                </AnimatePresence>
             </ul>
         </div>
     );
