@@ -24,7 +24,7 @@ const AreasPage: React.FC = () => {
 
     const handlePlantCareInfo = (info: string) => {
         setCareInstructions(info);
-        setTimeout(() => setCareInstructions(""), 20000); // Oblaček izgine po 10s (po želji)
+        setTimeout(() => setCareInstructions(""), 20000); // Oblaček izgine po 10s
     };
 
     useEffect(() => {
@@ -86,7 +86,7 @@ const AreasPage: React.FC = () => {
                 initialAssignments={initialData.plantAssignments}
                 initialLocations={initialData.cellLocations}
                 onSave={handleSave}
-                onPlantCareInfo={handlePlantCareInfo} // ✅ dodamo ta prop
+                onPlantCareInfo={handlePlantCareInfo}
             />
 
             {careInstructions && <PlantCareBubble message={careInstructions} />}

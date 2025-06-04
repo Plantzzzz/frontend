@@ -59,7 +59,7 @@ export const shouldWaterOutsidePlants = async (userId: string): Promise<boolean>
 export async function generateWateringEventsForSpace(spaceId: string) {
   console.log("🌿 [START] Generiram zalivalne dogodke za space:", spaceId);
 
-  const calendarToken = localStorage.getItem("calendarToken");
+  const calendarToken = sessionStorage.getItem("calendarToken");
   if (!calendarToken) {
     alert("Google Calendar token manjka.");
     return;

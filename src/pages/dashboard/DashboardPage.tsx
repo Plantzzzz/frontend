@@ -122,12 +122,24 @@ export default function Dashboard() {
   const cardClasses =
       "bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-md hover:shadow-green-500/20 transition-all duration-300 hover:scale-[1.01] cursor-pointer";
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>, path: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      navigate(path);
+    }
+  };
+
   return (
       <div className="min-h-screen bg-gradient-to-br text-gray-100 px-6 py-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-7xl mx-auto">
           {/* Left Column */}
           <div className="md:col-span-7 space-y-6">
-            <div onClick={() => navigate("/dashboard/stats")} className={cardClasses}>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate("/dashboard/stats")}
+              onKeyDown={(e) => handleKeyDown(e, "/dashboard/stats")}
+              className={cardClasses}
+            >
               <div className="flex items-center space-x-4">
                 <LineChart className="text-green-400 w-12 h-12 animate-pulse" />
                 <div>
@@ -137,7 +149,14 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div onClick={() => navigate("/dashboard/plants")} className={cardClasses}>
+            {/* Plants Card */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate("/dashboard/plants")}
+              onKeyDown={(e) => handleKeyDown(e, "/dashboard/plants")}
+              className={cardClasses}
+            >
               <div className="flex items-center space-x-4">
                 <Flower2 className="text-green-400 w-12 h-12 animate-spin-slow" />
                 <div>
@@ -147,7 +166,14 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div onClick={() => navigate("/dashboard/plantRecognition")} className={cardClasses}>
+            {/* Plant Recognition Card */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate("/dashboard/plantRecognition")}
+              onKeyDown={(e) => handleKeyDown(e, "/dashboard/plantRecognition")}
+              className={cardClasses}
+            >
               <div className="flex items-center space-x-4">
                 <Wand2 className="text-green-400 w-12 h-12 animate-wiggle" />
                 <div>
@@ -157,7 +183,14 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div onClick={() => navigate("/dashboard/spaces")} className={cardClasses}>
+            {/* Spaces Card */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate("/dashboard/spaces")}
+              onKeyDown={(e) => handleKeyDown(e, "/dashboard/spaces")}
+              className={cardClasses}
+            >
               <div className="flex items-center space-x-4">
                 <Globe2 className="text-green-400 w-12 h-12" />
                 <div>
