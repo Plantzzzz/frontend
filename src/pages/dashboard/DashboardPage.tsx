@@ -124,10 +124,6 @@ export default function Dashboard() {
 
   return (
       <div className="min-h-screen bg-gradient-to-br text-gray-100 px-6 py-10">
-        <h1 className="text-4xl font-bold mb-12 text-center animate-fade-in-up">
-          🌱 Dashboard
-        </h1>
-
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-7xl mx-auto">
           {/* Left Column */}
           <div className="md:col-span-7 space-y-6">

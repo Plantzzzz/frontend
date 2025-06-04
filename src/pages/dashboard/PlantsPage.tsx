@@ -14,7 +14,6 @@ const PlantsPage: React.FC = () => {
 
     return (
         <div className="max-w-5xl mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-4">Plants</h1>
             <PlantList selected={selectedPlant} onSelect={setSelectedPlant} />
             {selectedPlant && (
                 <PlantProfileModal

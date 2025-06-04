@@ -10,8 +10,7 @@ import {
     doc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
-import { Trash2 } from "lucide-react";
-import { Button } from "flowbite-react";
+import { Trash2, Plus } from "lucide-react";
 import TutorialModal from "../../components/dashboard/TutorialModal";
 
 interface Space {
@@ -97,24 +96,28 @@ const SpacesPage: React.FC = () => {
     }, []);
 
     return (
-        <div className="max-w-screen-xl mx-auto px-4 py-8 text-white">
-            {/* Create & Search Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                <div className="flex gap-2">
+        <div className="max-w-7xl mx-auto px-4 py-10 text-white">
+            {/* Create & Search */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div className="flex gap-2 items-center">
                     <input
                         type="text"
                         placeholder="New space name"
                         value={newSpaceName}
                         onChange={(e) => setNewSpaceName(e.target.value)}
-                        className="flex-grow px-4 py-2 rounded-md border border-gray-600 bg-gray-900 text-white"
+                        className="flex-grow px-4 py-2 rounded-lg border border-gray-700 bg-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200"
                     />
-                    <Button
-                        color="success"
+                    <button
                         onClick={handleCreateSpace}
                         disabled={!newSpaceName.trim() || loading}
+                        className={`flex items-center gap-1 px-4 py-2 rounded-lg font-medium transition duration-200 ${
+                            !newSpaceName.trim() || loading
+                                ? "bg-green-600/50 text-gray-400 cursor-not-allowed"
+                                : "bg-green-600 hover:bg-green-700 text-white"
+                        }`}
                     >
-                        + Add
-                    </Button>
+                        <Plus className="w-4 h-4" /> Add
+                    </button>
                 </div>
                 <div className="md:col-span-2">
                     <input
@@ -122,48 +125,51 @@ const SpacesPage: React.FC = () => {
                         placeholder="Search spaces..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full px-4 py-2 rounded-md border border-gray-600 bg-gray-900 text-white"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200"
                     />
                 </div>
             </div>
 
-            {/* Spaces Display */}
+            {/* Spaces List */}
             {filteredSpaces.length === 0 ? (
-                <div className="text-center py-20 text-gray-500 border border-gray-700 rounded-lg">
-                    <p className="text-lg">No spaces found.</p>
+                <div className="text-center py-20 text-gray-400 border border-gray-700 rounded-lg animate-fade-in">
+                    <p className="text-lg font-semibold">No spaces found.</p>
                     <p className="text-sm">Try creating one or adjusting your search.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
                     {filteredSpaces.map((space) => (
                         <div
                             key={space.id}
-                            className="bg-gray-800 rounded-lg p-5 flex flex-col justify-between shadow transition hover:shadow-lg hover:bg-gray-700"
+                            className="bg-gray-800 rounded-xl p-5 flex flex-col justify-between shadow-md hover:shadow-green-500/20 transform hover:scale-[1.02] transition-all duration-300 border border-gray-700"
                         >
                             <div>
-                                <h2 className="text-xl font-semibold mb-1">{space.name}</h2>
+                                <h2 className="text-xl font-semibold mb-1 text-white">{space.name}</h2>
                                 <p className="text-xs text-gray-400">
                                     ID: {space.id.slice(0, 8)}...
                                 </p>
                             </div>
                             <div className="flex justify-between gap-2 mt-6">
-                                <Button color="blue" onClick={() => handleView(space.id)} size="sm">
+                                <button
+                                    onClick={() => handleView(space.id)}
+                                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg transition duration-200"
+                                >
                                     View
-                                </Button>
-                                <Button
-                                    color="failure"
+                                </button>
+                                <button
                                     onClick={() => handleDelete(space.id)}
-                                    size="sm"
+                                    className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg transition duration-200"
                                     title="Delete Space"
                                 >
                                     <Trash2 className="w-4 h-4" />
-                                </Button>
+                                </button>
                             </div>
                         </div>
                     ))}
                 </div>
             )}
-            <TutorialModal/>
+
+            <TutorialModal />
         </div>
     );
 };
