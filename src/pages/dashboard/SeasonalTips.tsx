@@ -93,7 +93,6 @@ export default function SeasonalCalendar() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">🌱 Seasonal Planting Calendar</h1>
 
       {/* Export gumbi */}
       <div className="mb-4 flex gap-4">

@@ -17,15 +17,6 @@ const PlantNotesAndTodosPage: React.FC = () => {
 
     return (
         <div className="max-w-5xl mx-auto p-6">
-            <motion.h1
-                className="text-4xl font-bold mb-12 text-center"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                🌱 Plant Notes
-            </motion.h1>
-
             <div className="mb-8">
                 <SimplePlantSelector
                     onSelect={(plant) => setSelected(plant)}
