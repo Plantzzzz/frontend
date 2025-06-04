@@ -133,8 +133,11 @@ const exportToPDF = (selectedPlants: string[]) => {
 
 
   return (
+
     <div className="p-6 bg-gray-900 min-h-screen text-gray-200 font-sans">
       <h1 className="text-3xl font-extrabold mb-6 text-green-400 select-none">🌱 Seasonal Planting Calendar</h1>
+
+    <div className="p-6">
 
       {/* Export gumbi */}
       <div className="mb-6 flex flex-wrap gap-4">
@@ -266,6 +269,7 @@ const exportToPDF = (selectedPlants: string[]) => {
           ))}
         </div>
       </div>
+    </div>
     </div>
   );
 }
