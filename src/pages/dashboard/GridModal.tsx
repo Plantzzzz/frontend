@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
@@ -45,6 +45,29 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
 
     const [amount, setAmount] = useState<string>("1");
     const [resizeDirection, setResizeDirection] = useState<Direction>("bottom");
+
+    useEffect(() => {
+        const fetchCoordinates = async () => {
+            if (!spaceId) return;
+            try {
+                const ref = doc(db, "spaces", spaceId);
+                const docSnap = await getDoc(ref);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const lat = data?.latitude;
+                    const lng = data?.longitude;
+
+                    if (lat && lng) {
+                        setLatitude(lat);
+                        setLongitude(lng);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching coordinates:", error);
+            }
+        };
+        fetchCoordinates();
+    }, [spaceId]);
 
     const handleApply = () => {
         const numericAmount = parseInt(amount, 10);
