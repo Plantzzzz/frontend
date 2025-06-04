@@ -23,7 +23,8 @@ const AreasPage: React.FC = () => {
 
     const handlePlantCareInfo = (info: string) => {
         setCareInstructions(info);
-        setTimeout(() => setCareInstructions(""), 20000); // Bubble disappears after 20s
+        setTimeout(() => setCareInstructions(""), 20000);
+
     };
 
     useEffect(() => {
@@ -87,6 +88,7 @@ const AreasPage: React.FC = () => {
                 onSave={handleSave}
                 onPlantCareInfo={handlePlantCareInfo}
                 className="flex-grow"
+
             />
 
             {careInstructions && (

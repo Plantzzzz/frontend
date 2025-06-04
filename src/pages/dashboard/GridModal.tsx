@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc  } from "firebase/firestore";
 import { db } from "../../firebase";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix default Leaflet icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png",
@@ -45,6 +44,35 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
 
     const [amount, setAmount] = useState<string>("1");
     const [resizeDirection, setResizeDirection] = useState<Direction>("bottom");
+    const [locationWarning, setLocationWarning] = useState<string>("");
+
+    useEffect(() => {
+        const fetchLocation = async () => {
+            try {
+                const ref = doc(db, "spaces", spaceId);
+                const snap = await getDoc(ref);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (typeof data.latitude === "number" && typeof data.longitude === "number") {
+                        setLatitude(data.latitude);
+                        setLongitude(data.longitude);
+                        setLocationWarning("");
+                    } else {
+                        setLocationWarning("⚠️ Ta prostor še nima nastavljenih koordinat.");
+                    }
+                } else {
+                    setLocationWarning("⚠️ Prostor ne obstaja v bazi.");
+                }
+            } catch (err) {
+                console.error("Napaka pri pridobivanju lokacije:", err);
+                setLocationWarning("⚠️ Napaka pri pridobivanju lokacije.");
+            }
+        };
+
+        if (initialLat === undefined || initialLon === undefined) {
+            fetchLocation();
+        }
+    }, [spaceId, initialLat, initialLon]);
 
     useEffect(() => {
         const fetchCoordinates = async () => {
@@ -90,10 +118,10 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
                 latitude: Number(latitude),
                 longitude: Number(longitude),
             });
-            alert("📍 Location saved successfully.");
+            //alert("📍 Location saved successfully.");
         } catch (err) {
             console.error("❌ Error saving location:", err);
-            alert("Error saving location.");
+            //alert("Error saving location.");
         } finally {
             setSaving(false);
         }

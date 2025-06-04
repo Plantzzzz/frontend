@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { auth, googleProvider, facebookProvider } from '../../firebase.ts';
+import { auth, facebookProvider } from '../../firebase.ts';
 import { signInWithEmailAndPassword, signInWithPopup, getAuth, GoogleAuthProvider} from 'firebase/auth';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
@@ -53,7 +53,7 @@ export const LoginForm = () => {
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const accessToken = credential?.accessToken;
       if (accessToken) {
-        localStorage.setItem("calendarToken", accessToken);
+        sessionStorage.setItem("calendarToken", accessToken);
         setToken(accessToken);
         console.log("Google Calendar Access Token:", accessToken);
       }
