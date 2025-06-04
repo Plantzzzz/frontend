@@ -79,10 +79,6 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
     };
 
     const handleApply = () => {
-        console.log("🌐 handleApply called");
-        console.log("👉 inputRows:", inputRows, "rows:", rows);
-        console.log("👉 inputCols:", inputCols, "cols:", cols);
-
         let newAssignments: { [key: string]: string } = {};
         let newLocations: { [key: string]: "inside" | "outside" } = {};
 
@@ -112,10 +108,8 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
             newLocations[newKey] = value;
         });
 
-        // Validate that rows and cols are at least 1
         const safeRows = Math.max(inputRows, 1);
         const safeCols = Math.max(inputCols, 1);
-        console.log("📝 Final Rows:", safeRows, "Final Cols:", safeCols);
 
         setRows(safeRows);
         setCols(safeCols);
@@ -126,8 +120,6 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
         setIsPlantingMode(false);
         setCurrentPlant(null);
     };
-
-
 
     const handlePlantCareInfo = (info: string) => {
         onPlantCareInfo(info);
@@ -187,7 +179,6 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                 timestamp: serverTimestamp(),
             });
             alert("Dogodek uspešno shranjen.");
-            console.log("Shranjujem dogodek v spaceId:", spaceId);
         } catch (error) {
             console.error("Napaka pri shranjevanju dogodka:", error);
             alert("Napaka pri shranjevanju.");
@@ -200,9 +191,7 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
         <>
             <nav className="bg-gray-800 text-white px-6 py-4 flex flex-col gap-3 md:flex-row md:justify-between md:items-center shadow-md">
                 <div className="flex flex-wrap justify-between items-center w-full text-sm">
-                    <div className="flex flex-wrap gap-3">
-                        {/* Removed Edit Mode button! */}
-                    </div>
+                    <div className="flex flex-wrap gap-3"></div>
                     <div className="ml-auto flex gap-3">
                         <button
                             onClick={() => setShowPopup(true)}
@@ -225,42 +214,28 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                             <Save className="w-4 h-4" /> Save Table
                         </button>
 
-                       {!editMode && (
-                        <>
-                            <button
-                            onClick={() => {
-                                if (!spaceId) {
-                                    alert("Manjka spaceId.");
-                                    return;
-                                }
-                                console.log("➡️ Kličem generateWateringEventsForSpace za:", spaceId);
-                                generateWateringEventsForSpace(spaceId);
-                            }}
-                            className="bg-indigo-600 hover:bg-indigo-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
-
-                        >
-                            💧Create watering events
-                        </button>
-                        <button
-                            onClick={handleRecommendations}
-                            className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded"
-                        >
-                            💡Recommendations
-                        </button>
-
-                            >
-                            💧Create watering events
-                            </button>
-
-                            <button
-                            onClick={handleRecommendations}
-                            className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded"
-                            >
-                            💡Recommendations
-                            </button>
-                        </>
+                        {!editMode && (
+                            <>
+                                <button
+                                    onClick={() => {
+                                        if (!spaceId) {
+                                            alert("Manjka spaceId.");
+                                            return;
+                                        }
+                                        generateWateringEventsForSpace(spaceId);
+                                    }}
+                                    className="bg-indigo-600 hover:bg-indigo-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
+                                >
+                                    💧 Create watering events
+                                </button>
+                                <button
+                                    onClick={handleRecommendations}
+                                    className="bg-purple-600 hover:bg-purple-700 px-2 py-1 rounded font-semibold transition"
+                                >
+                                    💡 Recommendations
+                                </button>
+                            </>
                         )}
-
                     </div>
                 </div>
             </nav>
