@@ -119,7 +119,7 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
             Choose how many rows or columns to add and from which side.
         </p>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2 ">
             <div className="flex items-center justify-between gap-6">
                 <label className="flex flex-col text-sm font-medium w-1/2">
                     Amount
@@ -168,7 +168,7 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
 
             <div className="space-y-2">
                 <h3 className="text-lg font-semibold">Select Location on Map</h3>
-                <div className="h-64">
+                <div className="h-50 w-full">
                     <MapContainer
                         center={[
                             Number(latitude) || 46.55914802636066,
