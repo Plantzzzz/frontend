@@ -21,10 +21,9 @@ const AreasPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [careInstructions, setCareInstructions] = useState<string>("");
 
-
     const handlePlantCareInfo = (info: string) => {
         setCareInstructions(info);
-        setTimeout(() => setCareInstructions(""), 20000); // Oblaček izgine po 10s (po želji)
+        setTimeout(() => setCareInstructions(""), 20000); // Bubble disappears after 20s
     };
 
     useEffect(() => {
@@ -46,7 +45,7 @@ const AreasPage: React.FC = () => {
                             rows: 3,
                             cols: 4,
                             plantAssignments: {},
-                            cellLocations: {}
+                            cellLocations: {},
                         });
                     }
                 } else {
@@ -78,7 +77,7 @@ const AreasPage: React.FC = () => {
     }
 
     return (
-        <div>
+        <div className="flex flex-col">
             <SecondaryNavbar
                 spaceId={spaceId}
                 initialRows={initialData.rows}
@@ -86,10 +85,13 @@ const AreasPage: React.FC = () => {
                 initialAssignments={initialData.plantAssignments}
                 initialLocations={initialData.cellLocations}
                 onSave={handleSave}
-                onPlantCareInfo={handlePlantCareInfo} // ✅ dodamo ta prop
+                onPlantCareInfo={handlePlantCareInfo}
+                className="flex-grow"
             />
 
-            {careInstructions && <PlantCareBubble message={careInstructions} />}
+            {careInstructions && (
+                <PlantCareBubble message={careInstructions} />
+            )}
         </div>
     );
 };
