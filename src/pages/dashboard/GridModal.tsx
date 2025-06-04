@@ -135,13 +135,19 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
 
     return (
 <div
-    className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-start z-50" // No margin here
-    onClick={handleBackdropClick}
+  className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-start z-50"
+  onClick={handleBackdropClick}
+  role="dialog"
+  tabIndex={-1}
 >
-    <div
-        className="bg-gray-900 p-6 rounded shadow-lg text-white w-[28rem] space-y-5 mt-25 " // Added mt-16 only here
-        onClick={(e) => e.stopPropagation()}
-    >
+
+            <div
+                className="bg-gray-900 p-6 rounded shadow-lg text-white w-[28rem] space-y-5"
+                onClick={(e) => e.stopPropagation()}
+                  role="dialog"
+                 tabIndex={-1}
+            >
+
         <h2 className="text-2xl font-semibold text-center">Edit Grid</h2>
         <p className="text-sm text-gray-300 text-center">
             Choose how many rows or columns to add and from which side.
