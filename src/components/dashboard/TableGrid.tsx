@@ -92,90 +92,176 @@ const TableGrid: React.FC<TableGridProps> = ({
         setIsMouseDown(false);
     };
 
-    const renderGrid = () => {
-        const rowsArray = [];
 
-        for (let r = 1; r <= rows; r++) {
-            const colsArray = [];
-            for (let c = 1; c <= cols; c++) {
-                const key = `${r}-${c}`;
-                const assignedPlant = plantAssignments[key];
-                const location = cellLocations[key];
+const renderGrid = () => {
+    const rowsArray = [];
 
-                let cellClass =
-                    "w-20 h-20 border flex items-center justify-center text-sm cursor-pointer ";
-                if (location === "inside") cellClass += "bg-blue-300 ";
-                else if (location === "outside") cellClass += "bg-yellow-300 ";
-                else cellClass += "bg-gray-200 ";
+    for (let r = 1; r <= rows; r++) {
+        const colsArray = [];
+        for (let c = 1; c <= cols; c++) {
+            const key = `${r}-${c}`;
+            const assignedPlant = plantAssignments[key];
+            const location = cellLocations[key];
 
-                colsArray.push(
-                    <div
-                        key={key}
-                        className={cellClass}
-                        onMouseDown={() => handleMouseDown(r, c)}
-                        onMouseEnter={() => handleMouseEnter(r, c)}
-                        onMouseUp={handleMouseUp}
-                        title={assignedPlant || location || ""}
-                    >
-                        {assignedPlant && (
-                            <span className="text-black font-medium text-sm flex flex-col items-center">
-                                <span>{plantIcons[assignedPlant] || "🌱"}</span>
-                                <span>{assignedPlant}</span>
-                            </span>
-                        )}
-                    </div>
-                );
-            }
-            rowsArray.push(
-                <div key={r} className="flex">
-                    {colsArray}
+            let cellClass =
+                "w-24 h-24 border border-gray-700 cursor-pointer flex items-center justify-center rounded-md transition duration-150 ease-in-out ";
+
+            if (location === "inside") cellClass += "bg-blue-700 hover:bg-blue-600";
+            else if (location === "outside") cellClass += "bg-yellow-400 hover:bg-yellow-300";
+            else cellClass += "bg-gray-600 hover:bg-gray-500";
+
+            colsArray.push(
+                <div
+                    key={key}
+                    className={cellClass}
+                    onMouseDown={() => handleMouseDown(r, c)}
+                    onMouseEnter={() => handleMouseEnter(r, c)}
+                    onMouseUp={handleMouseUp}
+                    title={assignedPlant || location || ""}
+                >
+                    {assignedPlant && (
+                        <span className="text-white font-semibold text-base text-center">
+                            {assignedPlant}
+                        </span>
+                    )}
                 </div>
             );
         }
 
-        return (
-            <div className="flex flex-col">
-                {rowsArray}
+        rowsArray.push(
+            <div key={r} className="flex gap-1 mb-1">
+                {colsArray}
             </div>
         );
-    };
+    }
 
     return (
-        <div
-            className="select-none flex w-full"
-            onMouseLeave={() => setIsMouseDown(false)}
-        >
-            {/* Left side: Centered table */}
-            <div className="w-[85%] flex justify-center">
-                {renderGrid()}
-            </div>
-
-            {/* Right side: Weather info */}
-            <div className="w-[15%] space-y-4">
-                {weather && (
-                    <div className="p-4 bg-gray-100 rounded shadow flex items-center gap-4">
-                        <div className="text-4xl">{getWeatherIcon(weather.weatherCode)}</div>
-                        <div className="text-sm text-gray-800">
-                            <div><strong>Temperature:</strong> {weather.temperature}°C</div>
-                            <div><strong>Precipitation:</strong> {weather.precipitation} mm</div>
-                        </div>
-                    </div>
-                )}
-
-                {rainExpected !== null && (
-                    <div
-                        className={`p-4 rounded flex items-center gap-4 shadow ${
-                            rainExpected ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                        }`}
-                    >
-                        {rainExpected
-                            ? "🌧 Rain is expected – watering is not necessary."
-                            : "☀️ No rain expected – you might need to water the plants."}
-                    </div>
-                )}
-            </div>
+        <div className="p-6 rounded-lg shadow-md border border-gray-700 bg-gray-800 w-fit">
+            {rowsArray}
         </div>
     );
+};
+
+
+
+
+  const findOrCreateAppCalendar = async (accessToken: string) => {
+    // 1. Pokliči calendarList in takoj preveri status
+    const listRes = await fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!listRes.ok) {
+    const error = await listRes.json();
+    console.error("Napaka pri branju calendarList:", error);
+    throw new Error("Ni dovoljenja za branje seznama koledarjev.");
+  }
+
+  // 2. Če je vse OK, nadaljuj z branjem podatkov
+  const listData = await listRes.json();
+
+  const existing = listData.items.find((cal: any) => cal.summary === "Moja Aplikacija");
+  if (existing) return existing.id;
+
+  // 3. Če ni, ustvari nov koledar
+  const createRes = await fetch("https://www.googleapis.com/calendar/v3/calendars", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      summary: "Moja Aplikacija",
+      timeZone: "Europe/Ljubljana",
+    }),
+  });
+
+  if (!createRes.ok) {
+    const error = await createRes.json();
+    console.error("Napaka pri ustvarjanju koledarja:", error);
+    throw new Error("Napaka pri ustvarjanju koledarja.");
+  }
+
+  const newCal = await createRes.json();
+  return newCal.id;
+};
+
+const addEventToAppCalendar = async () => {
+  const accessToken = localStorage.getItem("calendarToken");
+  if (!accessToken) {
+    alert("Uporabnik ni prijavljen.");
+    return;
+  }
+
+  const calendarId = await findOrCreateAppCalendar(accessToken);
+
+const event = {
+  summary: "Poreži rožmarin",
+  description: "Poreži rožmarin.",
+  start: {
+    dateTime: new Date('2025-07-04T10:00:00+02:00').toISOString(), // UTC+2 za Ljubljano poleti
+    timeZone: "Europe/Ljubljana",
+  },
+  end: {
+    dateTime: new Date('2025-07-04T13:00:00+02:00').toISOString(), // Traja 1 uro
+    timeZone: "Europe/Ljubljana",
+  },
+};
+
+
+  const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(event),
+  });
+
+  if (res.ok) alert("Dogodek dodan!");
+  else alert("Napaka pri dodajanju dogodka.");
+};
+
+
+return (
+  <div
+    className="select-none flex justify-center items-start w-full min-h-screen bg-gray-900 py-8"
+    onMouseLeave={() => setIsMouseDown(false)}
+  >
+    <div className="flex w-full max-w-[90%] gap-8">
+      {/* Levi del: tabela */}
+      <div className="flex-1 flex justify-center">{renderGrid()}</div>
+
+      {/* Desni del: vreme in opozorilo */}
+      <div className="w-[250px] space-y-4">
+        {weather && (
+          <div className="p-4 bg-gray-800 text-white rounded shadow flex items-center gap-4">
+            <div className="text-4xl">{getWeatherIcon(weather.weatherCode)}</div>
+            <div className="text-sm">
+              <div><strong>Temperature:</strong> {weather.temperature}°C</div>
+              <div><strong>Precipitation:</strong> {weather.precipitation} mm</div>
+            </div>
+          </div>
+        )}
+
+        {rainExpected !== null && (
+          <div
+            className={`p-4 rounded flex items-center gap-4 shadow ${
+              rainExpected
+                ? "bg-green-900 text-green-200"
+                : "bg-red-900 text-red-200"
+            }`}
+          >
+            {rainExpected
+              ? "🌧 Rain is expected – watering is not necessary."
+              : "☀️ No rain expected – you might need to water the plants."}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
 };
 
 export default TableGrid;
