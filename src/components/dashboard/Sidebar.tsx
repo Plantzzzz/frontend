@@ -61,7 +61,7 @@ const MySidebar = () => {
     }, [location.pathname]);
 
     return (
-        <aside className="w-64 bg-gray-900 border-r border-gray-700 text-white h-full p-4 rounded-tr-2xl rounded-br-2xl shadow-xl">
+        <aside className="w-64 bg-gray-900 border-r border-gray-700 text-white h-full p-4 shadow-xl">
             <nav className="space-y-4 text-sm font-medium mt-5 md:mt-0">
                 {/* Dashboard */}
                 <SidebarLink to={`${dirRoot}`} icon={HiOutlineViewGrid} label="Dashboard" />
