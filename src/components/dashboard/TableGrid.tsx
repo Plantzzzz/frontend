@@ -228,7 +228,7 @@ const event = {
 
 return (
   <div
-    className="select-none flex justify-center items-start w-full min-h-screen bg-gray-900 py-8"
+    className="select-none flex justify-center items-start w-full bg-gray-900 py-8"
     onMouseLeave={() => setIsMouseDown(false)}
   >
     <div className="flex w-full max-w-[90%] gap-8">

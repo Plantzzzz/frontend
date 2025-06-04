@@ -22,7 +22,7 @@ function DashboardLayout() {
                     className={`
                         fixed z-40 md:relative md:translate-x-0 bg-gray-900 transition-transform duration-300 
                         w-64 overflow-y-auto border-r border-gray-700
-                        top-[56px] md:top-0 bottom-0
+                        top-[56px] md:top-0 bottom-0 p-4
                         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
                     `}
                 >
