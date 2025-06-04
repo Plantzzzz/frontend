@@ -111,13 +111,18 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
     };
 
     return (
-        <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50"
-            onClick={handleBackdropClick}
-        >
+<div
+  className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-start z-50"
+  onClick={handleBackdropClick}
+  role="dialog"
+  tabIndex={-1}
+>
+
             <div
                 className="bg-gray-900 p-6 rounded shadow-lg text-white w-[28rem] space-y-5"
                 onClick={(e) => e.stopPropagation()}
+                  role="dialog"
+                 tabIndex={-1}
             >
                 <h2 className="text-2xl font-semibold text-center">Edit Grid</h2>
                 <p className="text-sm text-gray-300 text-center">
