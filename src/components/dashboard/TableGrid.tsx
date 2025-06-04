@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { fetchWeatherData, getSpaceLocation } from "../../scripts/wateringService";
 
 interface TableGridProps {
-    spaceId: string; // ✅ DODAJ TO
+    spaceId: string;
     rows: number;
     cols: number;
     plantAssignments: { [key: string]: string };
@@ -15,8 +15,16 @@ interface TableGridProps {
     erasePlant: boolean;
 }
 
+// Hard-coded icons for specific plants
+const plantIcons: { [key: string]: string } = {
+    "golden pothos": "🌿",
+    "Aloe Vera": "🪴",
+    "spider plant": "🕸️",
+    // Add more mappings here if needed
+};
+
 const TableGrid: React.FC<TableGridProps> = ({
-                                                spaceId,
+                                                 spaceId,
                                                  rows,
                                                  cols,
                                                  plantAssignments,
@@ -24,30 +32,18 @@ const TableGrid: React.FC<TableGridProps> = ({
                                                  onCellClick,
                                              }) => {
     const [isMouseDown, setIsMouseDown] = useState(false);
-
-    const handleMouseDown = (row: number, col: number) => {
-        setIsMouseDown(true);
-        onCellClick(row, col);
-    };
-    
     const [weather, setWeather] = useState<null | {
         temperature: number;
         precipitation: number;
         weatherCode: number;
     }>(null);
-
     const [rainExpected, setRainExpected] = useState<boolean | null>(null);
 
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                console.log("📡 Pridobivam vreme za spaceId:", spaceId);
-
                 const { latitude, longitude } = await getSpaceLocation(spaceId);
-                console.log("📍 Lokacija prostora:", latitude, longitude);
-
                 const data = await fetchWeatherData(latitude, longitude);
-                console.log("🌦️ Podatki o vremenu:", data);
 
                 setWeather({
                     temperature: data.current.temperature_2m,
@@ -59,15 +55,13 @@ const TableGrid: React.FC<TableGridProps> = ({
                 const significantRain = next6Hours.some((val: number) => val >= 0.5);
                 setRainExpected(significantRain);
             } catch (error: any) {
-                console.error("❌ Napaka pri pridobivanju vremena:", error);
-                alert("❌ Napaka: " + error.message);
+                console.error("❌ Error fetching weather:", error);
+                alert("❌ Error: " + error.message);
             }
         };
 
         if (spaceId) {
             fetchWeather();
-        } else {
-            console.warn("⚠️ Manjka spaceId!");
         }
     }, [spaceId]);
 
@@ -81,7 +75,13 @@ const TableGrid: React.FC<TableGridProps> = ({
         if ([71, 73, 75, 85, 86].includes(code)) return "❄️";
         if ([95, 96, 99].includes(code)) return "⛈️";
         return "❓";
-    };    
+    };
+
+    const handleMouseDown = (row: number, col: number) => {
+        setIsMouseDown(true);
+        onCellClick(row, col);
+    };
+
     const handleMouseEnter = (row: number, col: number) => {
         if (isMouseDown) {
             onCellClick(row, col);
@@ -91,7 +91,6 @@ const TableGrid: React.FC<TableGridProps> = ({
     const handleMouseUp = () => {
         setIsMouseDown(false);
     };
-
 
 
 const renderGrid = () => {
@@ -262,7 +261,6 @@ return (
     </div>
   </div>
 );
-
 
 };
 

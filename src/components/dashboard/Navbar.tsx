@@ -11,8 +11,8 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
     const navigate = useNavigate();
     const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     const email = user?.email || "Email";
-    const username = user?.username || "Guest";
-    const profileImage = user?.profileImage || "";
+    const username = user?.displayName || "Guest";
+    const profileImage = user?.profileImage || user?.photoURL || "";
 
     const handleProfileClick = () => {
         navigate("/dashboard/user");
