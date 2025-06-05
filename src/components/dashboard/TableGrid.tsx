@@ -38,32 +38,35 @@ const TableGrid: React.FC<TableGridProps> = ({
         weatherCode: number;
     }>(null);
     const [rainExpected, setRainExpected] = useState<boolean | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchWeather = async () => {
-            try {
-                const { latitude, longitude } = await getSpaceLocation(spaceId);
-                const data = await fetchWeatherData(latitude, longitude);
+useEffect(() => {
+    const fetchWeather = async () => {
+        try {
+            const { latitude, longitude } = await getSpaceLocation(spaceId);
+            const data = await fetchWeatherData(latitude, longitude);
 
-                setWeather({
-                    temperature: data.current.temperature_2m,
-                    precipitation: data.current.precipitation,
-                    weatherCode: data.current.weathercode,
-                });
+            setWeather({
+                temperature: data.current.temperature_2m,
+                precipitation: data.current.precipitation,
+                weatherCode: data.current.weathercode,
+            });
 
-                const next6Hours = data.hourly.precipitation.slice(0, 6);
-                const significantRain = next6Hours.some((val: number) => val >= 0.5);
-                setRainExpected(significantRain);
-            } catch (error: any) {
-                console.error("❌ Error fetching weather:", error);
-                alert("❌ Error: " + error.message);
-            }
-        };
-
-        if (spaceId) {
-            fetchWeather();
+            const next6Hours = data.hourly.precipitation.slice(0, 6);
+            const significantRain = next6Hours.some((val: number) => val >= 0.5);
+            setRainExpected(significantRain);
+            setErrorMessage(null); // počisti prejšnjo napako
+        } catch (error: any) {
+            console.error("❌ Error fetching weather:", error);
+            setErrorMessage("⚠️ Unable to retrieve the space location or weather data.");
         }
-    }, [spaceId]);
+    };
+
+    if (spaceId) {
+        fetchWeather();
+    }
+}, [spaceId]);
+
 
     const getWeatherIcon = (code: number) => {
         if ([0].includes(code)) return "☀️";
@@ -225,7 +228,7 @@ const event = {
 
 return (
   <div
-    className="select-none flex justify-center items-start w-full min-h-screen bg-gray-900 py-8"
+    className="select-none flex justify-center items-start w-full bg-gray-900 py-8"
     onMouseLeave={() => setIsMouseDown(false)}
   >
     <div className="flex w-full max-w-[90%] gap-8">
@@ -234,6 +237,11 @@ return (
 
       {/* Desni del: vreme in opozorilo */}
       <div className="w-[250px] space-y-4">
+          {errorMessage && (
+            <div className="p-4 bg-yellow-900 text-yellow-200 rounded shadow">
+          {errorMessage}
+        </div>
+        )}
         {weather && (
           <div className="p-4 bg-gray-800 text-white rounded shadow flex items-center gap-4">
             <div className="text-4xl">{getWeatherIcon(weather.weatherCode)}</div>
