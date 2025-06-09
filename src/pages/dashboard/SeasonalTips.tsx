@@ -65,7 +65,7 @@ const pdfActivityColors: Record<string, [number, number, number]> = {
 const exportToPDF = (selectedPlants: string[]) => {
   const doc = new jsPDF("landscape");
   const headers = ["Plant", ...months];
-
+  console.log(selectedPlants)
   // Priprava vrstic za tabelo
   const rows = visiblePlants.map(plant => {
     const actions = sowingCalendar[plant];

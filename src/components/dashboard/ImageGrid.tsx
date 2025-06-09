@@ -39,7 +39,7 @@ const ImageGrid: React.FC<Props> = ({
 
         // Čas animacije (ustrezno CSS animaciji, npr. 300ms)
         const timeout = setTimeout(async () => {
-            await onDeleteImage(deletingUrl);
+            await onDeleteImage?.(deletingUrl);
             setDeletingUrl(null);
             // Če je zadnja slika na strani in stran ni prva, prestavi na prejšnjo stran
             if (pagedImages.length === 1 && page > 1) {

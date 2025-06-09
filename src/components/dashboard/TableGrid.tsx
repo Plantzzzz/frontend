@@ -18,14 +18,6 @@ interface TableGridProps {
   erasePlant: boolean;
 }
 
-// Hard-coded icons for specific plants
-const plantIcons: { [key: string]: string } = {
-  "golden pothos": "🌿",
-  "Aloe Vera": "🪴",
-  "spider plant": "🕸️",
-  // Add more mappings here if needed
-};
-
 const TableGrid: React.FC<TableGridProps> = ({
   spaceId,
   rows,
@@ -148,7 +140,7 @@ const TableGrid: React.FC<TableGridProps> = ({
       </div>
     );
   };
-
+/*
   const findOrCreateAppCalendar = async (accessToken: string) => {
     // 1. Pokliči calendarList in takoj preveri status
     const listRes = await fetch(
@@ -197,7 +189,7 @@ const TableGrid: React.FC<TableGridProps> = ({
     const newCal = await createRes.json();
     return newCal.id;
   };
-
+/*
   const addEventToAppCalendar = async () => {
     const accessToken = localStorage.getItem("calendarToken");
     if (!accessToken) {
@@ -235,7 +227,7 @@ const TableGrid: React.FC<TableGridProps> = ({
     if (res.ok) alert("Dogodek dodan!");
     else alert("Napaka pri dodajanju dogodka.");
   };
-
+*/
   return (
     <div
       className="select-none flex justify-center items-start w-full min-h-screen bg-gray-900 py-8"

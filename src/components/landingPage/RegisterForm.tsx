@@ -11,7 +11,7 @@ const RegisterForm = () => {
     const [formData, setFormData] = useState({email: '', password: '', confirmPassword: '', username: ''});
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [token, setToken] = useState<string | null>(null);
+    const [, setToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

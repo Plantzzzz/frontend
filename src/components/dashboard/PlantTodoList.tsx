@@ -53,17 +53,20 @@ const PlantTodoList: React.FC<Props> = ({ group }) => {
         fetchTasks();
     };
 
-    const toggleDone = async (task: Task) => {
+        const toggleDone = async (task: Task) => {
+        if (!auth.currentUser) return; // preveri, da user obstaja
         const ref = doc(db, "users", auth.currentUser.uid, "plantTasks", group.key, "todos", task.id);
         await updateDoc(ref, { done: !task.done });
         fetchTasks();
-    };
+        };
 
-    const deleteTask = async (task: Task) => {
+        const deleteTask = async (task: Task) => {
+        if (!auth.currentUser) return; // preveri, da user obstaja
         const ref = doc(db, "users", auth.currentUser.uid, "plantTasks", group.key, "todos", task.id);
         await deleteDoc(ref);
         fetchTasks();
-    };
+        };
+
 
     return (
         <div>

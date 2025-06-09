@@ -22,77 +22,79 @@ const PlantList: React.FC = () => {
   const [selected, setSelected] = useState<GroupedPlant | null>(null);
 
   useEffect(() => {
-    const fetchPlants = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
+const fetchPlants = async () => {
+  const user = auth.currentUser;
+  if (!user) return;
 
-      const allGroups: GroupedPlant[] = [];
+  const allGroups: GroupedPlant[] = [];
 
-      // === 1. PLANTS FROM 'spaces' ===
-      const qSpaces = query(collection(db, "spaces"), where("userId", "==", user.uid));
-      const snapSpaces = await getDocs(qSpaces);
+  // === 1. PLANTS FROM 'spaces' ===
+  const qSpaces = query(collection(db, "spaces"), where("userId", "==", user.uid));
+  const snapSpaces = await getDocs(qSpaces);
 
-      const groupsFromSpaces: Record<string, GroupedPlant> = {};
-      for (const docSnap of snapSpaces.docs) {
-        const data = docSnap.data();
-        const plantAssignments = data.tableData?.plantAssignments || {};
-        const cellLocations = data.tableData?.cellLocations || {};
+  const groupsFromSpaces: Record<string, GroupedPlant> = {};
+  for (const docSnap of snapSpaces.docs) {
+    const data = docSnap.data();
+    // Type assertion, da plantAssignments in cellLocations vsebujeta string vrednosti
+    const plantAssignments = (data.tableData?.plantAssignments || {}) as Record<string, string>;
+    const cellLocations = (data.tableData?.cellLocations || {}) as Record<string, string>;
 
-        for (const [cell, plant] of Object.entries(plantAssignments)) {
-          const location = cellLocations[cell];
-          if (!location) continue;
+    for (const [cell, plant] of Object.entries(plantAssignments)) {
+      const location = cellLocations[cell];
+      if (!location) continue;
 
-          const key = `${plant}_${location}`;
-          if (!groupsFromSpaces[key]) {
-            const plantQuery = query(collection(db, "plants"), where("common_name", "==", plant));
-            const plantSnap = await getDocs(plantQuery);
-            const image = plantSnap.empty
-              ? "https://source.unsplash.com/300x200/?plant"
-              : plantSnap.docs[0].data().image;
+      const key = `${plant}_${location}`;
+      if (!groupsFromSpaces[key]) {
+        const plantQuery = query(collection(db, "plants"), where("common_name", "==", plant));
+        const plantSnap = await getDocs(plantQuery);
+        const image = plantSnap.empty
+          ? "https://source.unsplash.com/300x200/?plant"
+          : (plantSnap.docs[0].data().image as string);
 
-            groupsFromSpaces[key] = {
-              key,
-              plant,
-              location,
-              cells: [],
-              image,
-              source: "spaces",
-            };
-          }
-          groupsFromSpaces[key].cells!.push(cell);
-        }
-      }
-
-      allGroups.push(...Object.values(groupsFromSpaces));
-
-      // === 2. PLANTS FROM 'saved_plants' ===
-      const qSaved = query(collection(db, "saved_plants"), where("uid", "==", user.uid));
-      const snapSaved = await getDocs(qSaved);
-
-      for (const docSnap of snapSaved.docs) {
-        const data = docSnap.data();
-        const plantName =
-          data.customName ||
-          data.commonName || // fallback
-          data.scientificName ||
-          "Unnamed Plant";
-
-        const location = data.location || "Unknown";
-        const image =
-          data.image ||
-          "https://source.unsplash.com/300x200/?plant";
-
-        allGroups.push({
-          key: `saved_${docSnap.id}`,
-          plant: plantName,
+        groupsFromSpaces[key] = {
+          key,
+          plant,
           location,
+          cells: [],
           image,
-          source: "saved",
-        });
+          source: "spaces",
+        };
       }
+      groupsFromSpaces[key].cells!.push(cell);
+    }
+  }
 
-      setGroups(allGroups);
-    };
+  allGroups.push(...Object.values(groupsFromSpaces));
+
+  // === 2. PLANTS FROM 'saved_plants' ===
+  const qSaved = query(collection(db, "saved_plants"), where("uid", "==", user.uid));
+  const snapSaved = await getDocs(qSaved);
+
+  for (const docSnap of snapSaved.docs) {
+    const data = docSnap.data();
+    const plantName =
+      data.customName ||
+      data.commonName || // fallback
+      data.scientificName ||
+      "Unnamed Plant";
+
+    const location = data.location || "Unknown";
+    const image =
+      data.image ||
+      "https://source.unsplash.com/300x200/?plant";
+
+    allGroups.push({
+      key: `saved_${docSnap.id}`,
+      plant: plantName,
+      location,
+      image,
+      source: "saved",
+    });
+  }
+
+  setGroups(allGroups);
+};
+
 
     const unsubscribe = auth.onAuthStateChanged(() => {
       fetchPlants();

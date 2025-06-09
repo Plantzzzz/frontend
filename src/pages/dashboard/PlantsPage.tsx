@@ -7,7 +7,10 @@ import { FiPlus } from 'react-icons/fi';  // Feather Icons, elegantna minimalist
 interface GroupedPlant {
     id: string;
     name: string;
-    // ... other properties
+    source: "spaces" | "saved";
+    key: string;
+    location: string;
+    plant: string;
 }
 
 const PlantsPage: React.FC = () => {
@@ -45,7 +48,7 @@ const PlantsPage: React.FC = () => {
               <FiPlus size={24} />
             </button>
 
-            <PlantList selected={selectedPlant} onSelect={setSelectedPlant} />
+            <PlantList />
             {selectedPlant && (
                 <PlantProfileModal
                     plant={selectedPlant}

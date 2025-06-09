@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 interface PlantPickerModalProps {
     plantOptions: string[];
@@ -25,7 +25,7 @@ const PlantPickerModal: React.FC<PlantPickerModalProps> = ({
     
 
     const handlePlantSelect = (plantName: string) => {
-        fetch('http://localhost:5000/get-plant-care', {
+        fetch('https://petalbot.onrender.com/get-plant-care', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ plant: plantName })

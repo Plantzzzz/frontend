@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  Sparkles,
   Flower2,
-  Droplets,
   LineChart,
   Globe2,
   Wand2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import dayjs from "dayjs";
 
@@ -23,11 +21,11 @@ interface WeatherData {
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  const [userId, setUserId] = useState<string | null>(null);
-  const [loadingWater, setLoadingWater] = useState(true);
-  const [wateringStreak, setWateringStreak] = useState(0);
-  const [lastWateredDate, setLastWateredDate] = useState<string | null>(null);
-  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [, setUserId] = useState<string | null>(null);
+  const [, setLoadingWater] = useState(true);
+  const [, setWateringStreak] = useState(0);
+  const [, setLastWateredDate] = useState<string | null>(null);
+  const [, setButtonDisabled] = useState(false);
 
   const OPEN_WEATHER_API_KEY = "c6c9bd51d22ce9242b41cf9c508a4cb9";
 
@@ -96,7 +94,7 @@ export default function Dashboard() {
     fetchWeather();
     return () => unsubscribe();
   }, []);
-
+/*
   const handleWater = async () => {
     if (!userId) return;
 
@@ -118,11 +116,11 @@ export default function Dashboard() {
     setLastWateredDate(today);
     setButtonDisabled(true);
   };
-
+*/
   const cardClasses =
       "bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-md hover:shadow-green-500/20 transition-all duration-300 hover:scale-[1.01] cursor-pointer";
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>, path: string) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, path: string) => {
     if (e.key === 'Enter' || e.key === ' ') {
       navigate(path);
     }

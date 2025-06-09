@@ -87,8 +87,6 @@ const AreasPage: React.FC = () => {
                 initialLocations={initialData.cellLocations}
                 onSave={handleSave}
                 onPlantCareInfo={handlePlantCareInfo}
-                className="flex-grow"
-
             />
 
             {careInstructions && (

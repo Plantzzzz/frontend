@@ -48,6 +48,7 @@ const PlantEditingMenu: React.FC<PlantEditingMenuProps> = ({
     useEffect(() => {
         if (menuOpen) {
             setEditMode(true);
+            console.log(editMode);
         } else {
             setEditMode(false);
             setIsErasing(false);

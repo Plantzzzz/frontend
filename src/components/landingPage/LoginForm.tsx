@@ -10,7 +10,7 @@ export const LoginForm = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-    const [token, setToken] = useState<string | null>(null);
+    const [, setToken] = useState<string | null>(null);
 
     const from = (location.state as any)?.from?.pathname || '/dashboard';
 

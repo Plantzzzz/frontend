@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { db, auth, storage } from '../../firebase';
+import { db, auth } from '../../firebase';
 import { addDoc, collection } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import SavePlantModal from './SavePlantModal';
 import { onAuthStateChanged } from 'firebase/auth';
 

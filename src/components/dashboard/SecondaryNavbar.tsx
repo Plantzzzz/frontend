@@ -1,7 +1,6 @@
 // src/components/dashboard/SecondaryNavbar.tsx
 
 import React, { useState, useEffect } from "react";
-import { Eraser, Leaf, MapPin, Save } from "lucide-react";
 import { collection, getDocs, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { generateWateringEventsForSpace } from "../../scripts/wateringService";
@@ -179,22 +178,7 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                 <div className="flex flex-wrap justify-between items-center w-full text-sm">
                     <div className="flex flex-wrap gap-3" />
                     <div className="ml-auto flex gap-3">
-                        <button
-                            onClick={() => setShowPopup(true)}
-                            className="bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
-                        >
-                            <MapPin className="w-4 h-4" /> Set Grid
-                        </button>
-                        <button
-                            onClick={() => {
-                                const data = { rows, cols, plantAssignments, cellLocations };
-                                onSave ? onSave(data) : console.log("Save clicked:", data);
-                            }}
-                            className="bg-green-600 hover:bg-green-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
-                        >
-                            <Save className="w-4 h-4" /> Save Table
-                        </button>
-                        {!editMode && (
+                        {(
                             <>
                                 <button
                                     onClick={() => {
@@ -231,7 +215,7 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
 
             {showPopup && (
                 <GridModal
-                    spaceId={spaceId}
+                    spaceId={spaceId!}
                     inputRows={inputRows}
                     inputCols={inputCols}
                     rows={rows}

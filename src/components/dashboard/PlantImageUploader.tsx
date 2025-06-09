@@ -43,8 +43,8 @@ const PlantImageUploader: React.FC = () => {
 
                 snap.forEach((docSnap) => {
                     const data = docSnap.data();
-                    const plantAssignments = data.tableData?.plantAssignments || {};
-                    const cellLocations = data.tableData?.cellLocations || {};
+                    const plantAssignments = (data.tableData?.plantAssignments || {}) as Record<string, string>;
+                    const cellLocations = (data.tableData?.cellLocations || {}) as Record<string, string>;
 
                     for (const [cell, plant] of Object.entries(plantAssignments)) {
                         const location = cellLocations[cell];
@@ -52,11 +52,12 @@ const PlantImageUploader: React.FC = () => {
 
                         const key = `${plant}_${location}`;
                         if (!allGroups[key]) {
-                            allGroups[key] = { key, plant, location, cells: [] };
+                        allGroups[key] = { key, plant, location, cells: [] };
                         }
                         allGroups[key].cells.push(cell);
                     }
                 });
+
 
                 setPlants(Object.values(allGroups));
             });
@@ -121,7 +122,7 @@ const PlantImageUploader: React.FC = () => {
             return baseUrl;
         } catch {
             // fallback
-            return `users/${uid}/plantImages/${selectedPlant.key}/${url.split("/").pop()}`;
+            return `users/${uid}/plantImages/${selectedPlant?.key}/${url.split("/").pop()}`;
         }
     }
 

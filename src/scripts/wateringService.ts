@@ -1,6 +1,6 @@
 import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
-
+/*
 type WateringEvent = {
   cellId: string;
   plantName: string;
@@ -8,7 +8,7 @@ type WateringEvent = {
   notes?: string;
   timestamp: Date;
 };
-
+*/
 function normalizeName(name: string): string {
   return name.toLowerCase().replace(/[^\w\s]/gi, "").replace(/\s+/g, " ").trim();
 }
@@ -74,9 +74,10 @@ export async function generateWateringEventsForSpace(spaceId: string) {
   const spaceData = spaceSnap.docs[0].data();
   const plantAssignments = spaceData.tableData?.plantAssignments || {};
   const spaceName = spaceData.name || "Vrt";
-
+/*
   const eventSnap = await getDocs(collection(db, `spaces/${spaceId}/plantEvents`));
-  const wateringEventsRaw = eventSnap.docs.map(doc => {
+  /*
+  const wateringEventsRaw: (WateringEvent | null)[] = eventSnap.docs.map(doc => {
     const data = doc.data();
     if (
       data.eventType === "watering" &&
@@ -95,8 +96,9 @@ export async function generateWateringEventsForSpace(spaceId: string) {
     return null;
   });
 
+/*
   const wateringEvents: WateringEvent[] = wateringEventsRaw.filter((e): e is WateringEvent => e !== null);
-
+*/
   const plantDocs = await getDocs(collection(db, "plants"));
   const wateringRules: Record<string, number> = {};
 
@@ -131,15 +133,15 @@ export async function generateWateringEventsForSpace(spaceId: string) {
       console.warn(`⚠️ ${plantName} nima definirane frekvence zalivanja – preskočim`);
       continue;
     }
-
+/*
     const plantWateringEvents = wateringEvents
       .filter(e => normalizeName(e.plantName) === normName)
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-
+/*
     const lastWatered = plantWateringEvents.length > 0
       ? plantWateringEvents[0].timestamp
       : null;
-
+*/
     for (let i = 1; i <= 21; i++) {
       if (i % frequency !== 0) continue;
 

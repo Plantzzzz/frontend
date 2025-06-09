@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png",
+// Popravljena ikona markerja
+const markerIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
 });
 
 type Direction = "top" | "bottom" | "left" | "right";
@@ -21,11 +24,20 @@ interface SetGridPopupProps {
   longitude?: number;
   onApply: (amount: number, direction: Direction) => void;
   onClose: () => void;
+
+  inputRows: number;
+  inputCols: number;
+  rows: number;
+  cols: number;
+  resizeDirection: Direction;
+
+  setInputRows: React.Dispatch<React.SetStateAction<number>>;
+  setInputCols: React.Dispatch<React.SetStateAction<number>>;
+  setResizeDirection: React.Dispatch<React.SetStateAction<Direction>>;
 }
 
-const LocationSelector: React.FC<{
-  setLatLng: (lat: number, lng: number) => void;
-}> = ({ setLatLng }) => {
+
+const LocationSelector: React.FC<{ setLatLng: (lat: number, lng: number) => void }> = ({ setLatLng }) => {
   useMapEvents({
     click(e) {
       setLatLng(e.latlng.lat, e.latlng.lng);
@@ -47,38 +59,6 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
 
   const [amount, setAmount] = useState<string>("1");
   const [resizeDirection, setResizeDirection] = useState<Direction>("bottom");
-  const [locationWarning, setLocationWarning] = useState<string>("");
-
-  useEffect(() => {
-    const fetchLocation = async () => {
-      try {
-        const ref = doc(db, "spaces", spaceId);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          const data = snap.data();
-          if (
-            typeof data.latitude === "number" &&
-            typeof data.longitude === "number"
-          ) {
-            setLatitude(data.latitude);
-            setLongitude(data.longitude);
-            setLocationWarning("");
-          } else {
-            setLocationWarning("⚠️ Ta prostor še nima nastavljenih koordinat.");
-          }
-        } else {
-          setLocationWarning("⚠️ Prostor ne obstaja v bazi.");
-        }
-      } catch (err) {
-        console.error("Napaka pri pridobivanju lokacije:", err);
-        setLocationWarning("⚠️ Napaka pri pridobivanju lokacije.");
-      }
-    };
-
-    if (initialLat === undefined || initialLon === undefined) {
-      fetchLocation();
-    }
-  }, [spaceId, initialLat, initialLon]);
 
   useEffect(() => {
     const fetchCoordinates = async () => {
@@ -88,10 +68,10 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
         const docSnap = await getDoc(ref);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          const lat = data?.latitude;
-          const lng = data?.longitude;
+          const lat = parseFloat(data?.latitude);
+          const lng = parseFloat(data?.longitude);
 
-          if (lat && lng) {
+          if (!isNaN(lat) && !isNaN(lng)) {
             setLatitude(lat);
             setLongitude(lng);
           }
@@ -106,17 +86,14 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
   const handleApply = () => {
     const numericAmount = parseInt(amount, 10);
     if (isNaN(numericAmount) || numericAmount === 0) {
-      alert("⚠️ Please enter a non-zero number.");
       return;
     }
     onApply(numericAmount, resizeDirection);
   };
 
   const handleSaveCoordinates = async () => {
-    if (latitude === "" || longitude === "") {
-      alert("⚠️ Please enter both coordinates.");
-      return;
-    }
+    if (latitude === "" || longitude === "") return;
+
     try {
       setSaving(true);
       const ref = doc(db, "spaces", spaceId);
@@ -124,10 +101,8 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
         latitude: Number(latitude),
         longitude: Number(longitude),
       });
-      //alert("📍 Location saved successfully.");
     } catch (err) {
       console.error("❌ Error saving location:", err);
-      //alert("Error saving location.");
     } finally {
       setSaving(false);
     }
@@ -143,33 +118,17 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
     <div
       className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-start z-50"
       onClick={handleBackdropClick}
-      onKeyDown={(e) => {
-        if (["Escape", "Enter", " "].includes(e.key)) {
-          onClose();
-        }
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="grid-modal-title"
-      tabIndex={0}
     >
       <div
-        className="bg-gray-900 p-6 rounded shadow-lg text-white w-[28rem] space-y-5"
+        className="bg-gray-900 p-6 rounded shadow-lg text-white w-[28rem] space-y-5 mt-25"
         onClick={(e) => e.stopPropagation()}
-        role="document"
-        tabIndex={0}
       >
-        <h2
-          id="grid-modal-title"
-          className="text-2xl font-semibold text-center"
-        >
-          Edit Grid
-        </h2>
+        <h2 className="text-2xl font-semibold text-center">Edit Grid</h2>
         <p className="text-sm text-gray-300 text-center">
           Choose how many rows or columns to add and from which side.
         </p>
 
-        <div className="flex flex-col gap-2 ">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-6">
             <label className="flex flex-col text-sm font-medium w-1/2">
               Amount
@@ -221,11 +180,11 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
             <div className="h-50 w-full">
               <MapContainer
                 center={[
-                  Number(latitude) || 46.55914802636066,
-                  Number(longitude) || 15.638042755523117,
+                  typeof latitude === "number" ? latitude : 46.559148,
+                  typeof longitude === "number" ? longitude : 15.638043,
                 ]}
                 zoom={15}
-                className="h-full rounded"
+                className="h-60 rounded"
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <LocationSelector
@@ -234,8 +193,8 @@ const SetGridPopup: React.FC<SetGridPopupProps> = ({
                     setLongitude(lng);
                   }}
                 />
-                {latitude && longitude && (
-                  <Marker position={[Number(latitude), Number(longitude)]} />
+                {typeof latitude === "number" && typeof longitude === "number" && (
+                  <Marker position={[latitude, longitude]} icon={markerIcon} />
                 )}
               </MapContainer>
             </div>

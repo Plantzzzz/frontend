@@ -16,7 +16,7 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
-Cypress.on('uncaught:exception', (err, runnable) => {
+Cypress.on('uncaught:exception', (err) => {
   // če želiš ignorirat samo Firebase offline error:
   if (err.message.includes('Failed to get document because the client is offline')) {
     return false; // prepreči, da Cypress faila test

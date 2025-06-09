@@ -31,7 +31,7 @@ const SimplePlantSelector: React.FC<Props> = ({ onSelect, selectedKey }) => {
                 const plantAssignments = data.tableData?.plantAssignments || {};
                 const cellLocations = data.tableData?.cellLocations || {};
 
-                for (const [cell, plant] of Object.entries(plantAssignments)) {
+                for (const [cell, plant] of Object.entries(plantAssignments as Record<string, string>)) {
                     const location = cellLocations[cell];
                     if (!location) continue;
 
@@ -48,6 +48,7 @@ const SimplePlantSelector: React.FC<Props> = ({ onSelect, selectedKey }) => {
 
         return () => unsubscribe();
     }, []);
+
 
     return (
         <div>
