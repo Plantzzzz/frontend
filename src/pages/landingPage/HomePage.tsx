@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
         <>
             <HeroSection />
             <ToolsSection />
-            <AssistantSection />
+            {/*<AssistantSection />*/}
             <CTASection />
             <TestimonialsSection />
             <FAQSection />
