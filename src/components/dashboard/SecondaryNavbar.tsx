@@ -163,14 +163,22 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                 notes,
                 timestamp: serverTimestamp(),
             });
-            alert("Event saved successfully.");
+            // TODO
         } catch (error) {
             console.error("Error saving event:", error);
-            alert("Error saving event.");
+            
         }
         setEventModalOpen(false);
         setSelectedCell(null);
     };
+
+
+    const [created, setCreated] = useState(false);
+
+    function handleCreateWateringEvents() {
+        setCreated(true);
+        setTimeout(() => setCreated(false), 3000);
+    }
 
     return (
         <>
@@ -182,12 +190,13 @@ const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({
                             <>
                                 <button
                                     onClick={() => {
-                                        if (!spaceId) return alert("Missing spaceId.");
+                                        if (!spaceId) return;
                                         generateWateringEventsForSpace(spaceId);
+                                        handleCreateWateringEvents();
                                     }}
                                     className="bg-indigo-600 hover:bg-indigo-700 px-2 py-1 rounded flex items-center gap-1 font-semibold transition"
                                 >
-                                    💧 Create watering events
+                                    {created ? "✅ Watering events created!" : "💧 Create watering events"}
                                 </button>
                                 <button
                                     onClick={handleRecommendations}

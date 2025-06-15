@@ -229,7 +229,7 @@ const PlantRecognizer: React.FC = () => {
               onClick={handleOpenSaveModal}
               className="mt-6 w-full bg-green-700 text-white py-2 rounded-md hover:bg-green-600"
             >
-              Shrani rastlino
+              Save Plant
             </button>
           </div>
         )}

@@ -61,7 +61,6 @@ export async function generateWateringEventsForSpace(spaceId: string) {
 
   const calendarToken = sessionStorage.getItem("calendarToken");
   if (!calendarToken) {
-    alert("Google Calendar token manjka.");
     return;
   }
 
@@ -208,6 +207,4 @@ export async function generateWateringEventsForSpace(spaceId: string) {
       console.error(`❌ Napaka pri ustvarjanju dogodka:`, err);
     }
   }
-
-  alert("✅ Zalivalni opomniki za naslednjih 21 dni so bili ustvarjeni!");
 }

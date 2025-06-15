@@ -61,9 +61,9 @@ const WateringTracker: React.FC = () => {
 
     return (
         <div className="text-center mt-6">
-            <h2 className="text-xl font-semibold mb-4 text-white">Zalivanje rastlin</h2>
+            <h2 className="text-xl font-semibold mb-4 text-white">Watering plants</h2>
             <p className="text-white mb-2">
-                🌱 Zaporednih dni zalivanja: <strong>{wateringStreak}</strong>
+                🌱 Watering streak: <strong>{wateringStreak}</strong>
             </p>
             <button
                 onClick={handleWater}
@@ -72,7 +72,7 @@ const WateringTracker: React.FC = () => {
                     buttonDisabled ? "bg-gray-500 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
                 }`}
             >
-                {buttonDisabled ? "Danes že zalito!" : "Zalil sem rože!"}
+                {buttonDisabled ? "Plants already watered!" : "I watered my plants!"}
             </button>
         </div>
     );

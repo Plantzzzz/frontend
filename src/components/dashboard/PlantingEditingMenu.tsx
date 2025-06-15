@@ -68,7 +68,6 @@ const PlantEditingMenu: React.FC<PlantEditingMenuProps> = ({
             onSave(data);
         } else {
             console.log("Save clicked:", data);
-            alert("No save handler provided. Data logged to console.");
         }
     };
 
